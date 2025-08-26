@@ -197,6 +197,9 @@ document.addEventListener("keyup", function(event) {
   }
 
   function renderList() {
+    
+    document.querySelector('.sra-noscripts').children[0].innerText=state.scripts.length?state.scripts.length+' script'+((state.scripts.length!=1)?'s':''):'No scripts yet'
+    
     scriptsList.innerHTML = '';
     state.scripts.forEach((script, index) => {
       const li = tpl.content.firstElementChild.cloneNode(true);
