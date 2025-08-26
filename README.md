@@ -32,9 +32,7 @@ The original extension relied on features no longer supported in MV3 and could n
   - Added deletion options with key combinations.  
   - Visual improvements and bugfixes.  
 
----
-
-![](ss/04.png)
+![](ss/05.png)
 
 ---
 
