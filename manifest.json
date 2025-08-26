@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ScriptAutoRunner",
+  "name": "ScriptAutoRunner3",
   "description": "Injects any script into a website. It can autorun as well.",
   "version": "0.1.0",
   "background": {
@@ -20,7 +20,7 @@
   "options_page": "options.html",
   "action": {
     "default_icon": "img/icon.png",
-    "default_title": "ScriptAutoRunner",
+    "default_title": "ScriptAutoRunner3",
     "default_popup": "popup.html"
   },
   "permissions": [

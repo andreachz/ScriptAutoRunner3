@@ -1,3 +1,5 @@
+const _POPUP_STORAGE_CHANGE_KEY = 'POPUP_STORAGE_CHANGE_KEY'
+
 var isShiftDown = false
 var isCrtlDown = false
 document.addEventListener("keydown", function(event) {
@@ -20,6 +22,18 @@ document.addEventListener("keyup", function(event) {
     console.log("Shift is released!");
     isCrtlDown = false
   }
+});
+
+
+window.addEventListener("storage", (event) => {
+  if(event.key == _POPUP_STORAGE_CHANGE_KEY || 1){
+    window.location.reload()
+  }
+  console.log("Storage changed!");
+  console.log("key:", event.key);
+  console.log("oldValue:", event.oldValue);
+  console.log("newValue:", event.newValue);
+  console.log("url:", event.url);
 });
 
 (function () {
@@ -196,9 +210,15 @@ document.addEventListener("keyup", function(event) {
     excludeText.value = state.options.exclude || '';
   }
 
+  function renderScriptsCounterIndicator(){
+    let totalScripts = state.scripts.length?state.scripts.length+' script'+((state.scripts.length!=1)?'s':''):'No scripts yet'
+    let activeScripts = state.scripts.length?', '+state.scripts.filter(x=>x.enable).length+' enabled':''
+    document.querySelector('.sra-noscripts').children[0].innerText=totalScripts+activeScripts
+  }
+
   function renderList() {
     
-    document.querySelector('.sra-noscripts').children[0].innerText=state.scripts.length?state.scripts.length+' script'+((state.scripts.length!=1)?'s':''):'No scripts yet'
+    renderScriptsCounterIndicator()
     
     scriptsList.innerHTML = '';
     state.scripts.forEach((script, index) => {
@@ -253,15 +273,15 @@ document.addEventListener("keyup", function(event) {
     save();
   }
 
-  function removeScript(index) {
+  function removeScript(index, isShiftDown=false, isCrtlDown=false) {
     if (index < 0 || index >= state.scripts.length) return;
     if(isShiftDown && isCrtlDown){
       if (window.confirm('Are you sure you want to delete all?')) {
         state.scripts=[]
         renderList();
         save();
-        return
       }
+      return
     }
     // console.log(state)
     if(isShiftDown || (!state.scripts[index].code.length && !state.scripts[index].src.length && !state.scripts[index].host.length)){
@@ -386,6 +406,7 @@ document.addEventListener("keyup", function(event) {
     const li = scriptsList.querySelector(`li[data-index="${index}"]`);
     if (li) li.classList.toggle('sra-script--enable', s.enable);
     save();
+    renderScriptsCounterIndicator()
   }
 
   function toggleSetting() {
@@ -416,7 +437,7 @@ document.addEventListener("keyup", function(event) {
     if (e.target.closest('.sra-script__plug'))      togglePowerPerScript(index);
     else if (e.target.closest('.move-up'))          moveUp(index);
     else if (e.target.closest('.move-down'))        moveDown(index);
-    else if (e.target.closest('.remove'))           removeScript(index);
+    else if (e.target.closest('.remove'))           removeScript(index, e.shiftKey, e.ctrlKey);
     else if (e.target.closest('.download'))         downloadScript(index);
   });
 
@@ -554,6 +575,7 @@ function setupDragAndDrop() {
         window.alert('Could not create script(s) from the dropped file(s).');
       }
     }
+    renderList()
   });
 }
 

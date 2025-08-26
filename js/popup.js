@@ -1,7 +1,7 @@
 (() => {
   const storageKey = 'SAR';
   const DEFAULT_OPTIONS = { exclude: '' };
-
+  const _POPUP_STORAGE_CHANGE_KEY = 'POPUP_STORAGE_CHANGE_KEY'
   // Elements
   const appEl = document.getElementById('app');
   const powerBtn = document.getElementById('powerToggle');
@@ -250,6 +250,7 @@
     if (!script) return;
     script.enable = !script.enable;
     save();
+    localStorage.setItem(_POPUP_STORAGE_CHANGE_KEY, new Date().valueOf())
     // Update just this item’s class
     li.classList.toggle('sra-script--enable', script.enable);
   });

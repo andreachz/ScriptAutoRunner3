@@ -21,9 +21,17 @@ The original extension relied on features no longer supported in MV3 and could n
 - **Manifest and API updates**  
   Adjusted background scripts, permissions, and other extension internals to meet MV3 standards.  
 
-- **Keeping it simple**
-  Familiar workflow preserved - designed as a drop-in replacement for the original extension.
+- **Keeping it simple**  
+  Familiar workflow preserved — designed as a drop-in replacement for the original extension.  
   Lightweight, dependency-free (no Vue.js required).  
+
+- **New features for improved UI and usability**  
+  - Added colored syntax highlighting for JavaScript code.  
+  - Added drag-and-drop support for easy import of `.js` files.  
+  - Added script download button.  
+  - Added deletion options with key combinations.  
+  - Visual improvements and bugfixes.  
+
 
 ---
 
@@ -41,7 +49,7 @@ Injects to any Script into a Website. It can be autorun as well.
 
 ## Install
 
-Download & install from Chrome Webstore.
+Download & install from Chrome Webstore. [Deprecated]
 
 [Download](https://chrome.google.com/webstore/detail/scriptautorunner/gpgjofmpmjjopcogjgdldidobhmjmdbm)
 
