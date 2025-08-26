@@ -1,72 +1,62 @@
-chrome.runtime.sendMessage({method: "SARgetLocalStorage"}, (response) => {
+chrome.runtime.sendMessage({ method: "SARgetLocalStorage" }, async (response) => {
+  const data = response?.data;
+  if (!data || !Array.isArray(data.scripts)) return;
 
-  function runScript(script) {
-    var tag = document.createElement('script');
-    
-    if (script.type === 'snippet') {
-      tag.innerHTML = script.code;
+  const hostname = location.hostname;
+  const matchList = (pattern) => {
+    if (!pattern || pattern === "any") return true;
+    return pattern.split(",").map(s => s.trim()).filter(Boolean)
+      .some(p => hostname.includes(p));
+  };
+  const isExcluded = (pattern) => {
+    if (!pattern) return false;
+    return pattern.split(",").map(s => s.trim()).filter(Boolean)
+      .some(p => hostname.includes(p));
+  };
+
+  if (data.options?.exclude && isExcluded(data.options.exclude)) return;
+
+  for (const script of data.scripts) {
+    if (!script?.enable) continue;
+    if (!matchList(script.host)) continue;
+
+    if (script.type === "external" && script.src) {
+      // Only works if the site's CSP allows that origin.
+      injectExternal(script.src);
+      continue;
     }
-    if (script.type === 'external') {
-      tag.src = script.src;
+
+    if (script.type === "snippet") {
+      // Try MAIN world (page context) first, then isolated world.
+      chrome.runtime.sendMessage({
+        method: "RUN_INLINE_SNIPPET",
+        code: script.code ?? "",
+        preferMainWorld: true
+      });
+      continue;
     }
-    document.body.appendChild(tag);
+
+    if (script.type === "file" && script.path) {
+      // Always CSP-safe.
+      injectExtensionFile(script.path);
+    }
   }
 
-  function isMatch(host) {
-    if (host === '' || host === 'any') {
-      return true;
-    }
-    
-    var hostname = window.location.hostname;
-    var hosts, match;
-    if (host.indexOf(',') !== -1) {
-      hosts = host.split(',');
-      match = hosts.some((_host) => {
-        return hostname.indexOf(_host.trim()) !== -1;
-      });
-    }
-    else {
-      match = hostname.indexOf(host) !== -1;
-    }
-    return match;
+  function injectExternal(url) {
+    const el = document.createElement("script");
+    el.src = url;
+    el.async = false;
+    (document.head || document.documentElement).appendChild(el);
+    el.addEventListener("load", () => el.remove());
+    el.addEventListener("error", () => { console.warn("[Ext] External load failed:", url); el.remove(); });
   }
-  
-  function isExcludeHost(host) {
-    if (host === '') {
-      return false;
-    }
-    
-    var hostname = window.location.hostname;
-    var hosts, match;
-    if (host.indexOf(',') !== -1) {
-      hosts = host.split(',');
-      match = hosts.some((_host) => {
-        return hostname.indexOf(_host.trim()) !== -1;
-      });
-      
-    }
-    else {
-      match = hostname.indexOf(host) !== -1;
-    }
-    
-    return match;
+
+  function injectExtensionFile(pathFromRoot) {
+    const el = document.createElement("script");
+    el.src = chrome.runtime.getURL(pathFromRoot);
+    el.async = false;
+    (document.head || document.documentElement).appendChild(el);
+    el.addEventListener("load", () => el.remove());
+    el.addEventListener("error", () => { console.warn("[Ext] File load failed:", pathFromRoot); el.remove(); });
   }
-  
-  var data = response.data;
-  
-  if (data.options && data.options.exclude) {
-    if (isExcludeHost(data.options.exclude)) {
-      return false;
-    }
-  }
-  
-  if (data.power) {
-    data.scripts.forEach((script) => {
-      if (script.enable) {
-        if(isMatch(script.host)) {
-          runScript(script);
-        }
-      }
-    });
-  }  
 });

@@ -255,7 +255,8 @@
     width: 64px;
   }
   .sra-script__plug:before {
-    content: "\f0e7";
+    /* content: "\f0e7"; */
+    content: "||";
     background-color: inherit;
     width: 25px;
     height: 35px;
@@ -267,7 +268,8 @@
     border-top-right-radius: 15%;
     border-bottom-right-radius: 15%;
     display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
+    /* font: normal normal normal 14px/1 FontAwesome; */
+    font: normal normal normal 14px/1 arial;
     font-size: 18px;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;

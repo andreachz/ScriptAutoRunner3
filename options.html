@@ -3,36 +3,39 @@
   <head>
     <meta charset="utf-8">
     <title>ScriptAutoRunner</title>
-    <link rel="stylesheet" href="css/fontello-embedded.css" media="screen" title="no title" charset="utf-8">
-    <link rel="stylesheet" href="css/base.css" media="screen" title="no title" charset="utf-8">
-    <link rel="stylesheet" href="css/options.css" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="css/fontello-embedded.css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="css/base.css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="css/options.css" media="screen" charset="utf-8">
   </head>
   <body>
-    <div class="sra-wrapper" id="app" v-cloak>
+    <div class="sra-wrapper" id="app">
       <div class="sra-setting">
-        <i class="icon-cog" v-on:click="toggleSetting"></i>
+        <i class="icon-cog" id="settingsToggle"></i>
       </div>
-      <div class="sra-setting__content" v-el:setting>
+
+      <div class="sra-setting__content" id="settingsPanel">
         <div class="sra-setting__container">
           <div class="sra-setting__body">
             <div class="sra-setting__header">
               <i class="icon-cog"></i>
               <span>Options</span>
-              <span v-on:click="toggleSetting"><i class="icon-cancel-circled"></i></span>
+              <span id="settingsClose"><i class="icon-cancel-circled"></i></span>
             </div>
             <div class="sra-setting__main">
               <div class="sra-flex">
                 <span><i class="icon-cloud-flash"></i></span>
                 <span> Exclude hostname</span>
               </div>
-              <textarea v-on:keyup="save" v-model="options .exclude" placeholder="Exclude hostnames, split by comma"></textarea>
+              <textarea id="excludeText" placeholder="Exclude hostnames, split by comma"></textarea>
             </div>
           </div>
         </div>
       </div>
-      <div class="sra-power" v-bind:class="{'sra-power--off': !power}" v-on:click="toggleSwitch">
+
+      <div class="sra-power" id="powerBtn" title="Toggle power">
         <i class="icon-flash"></i>
       </div>
+
       <div class="sra-main">
         <div class="sra-btns">
           <div class="sra-btns__battery">
@@ -41,53 +44,52 @@
           <div class="sra-btn src-btn--plus">
             <i class="icon-plus"></i>
           </div>
-          <button class="sra-btn" v-on:click="addScript('snippet')">
+          <button class="sra-btn" id="addSnippetBtn">
             <i class="icon-code"></i>
           </button>
-          <button class="sra-btn" v-on:click="addScript('external')">
+          <button class="sra-btn" id="addExternalBtn">
             <i class="icon-link"></i>
           </button>
         </div>
-        <ul class="sra-scripts">
-          <li class="sra-script" v-bind:class="{'sra-script--enable': script.enable}" v-for="script in scripts">
-            <div class="sra-script__plug" v-on:click="togglePower($index)"></div>
-            <div class="sra-script__box">
-              
-              <div class="sra-script__content">
-                <div class="sra-flex sra-flex--head">
-                  <input class="sra-script__name" type="text" v-model="script.name">
-                  <div class="sra-script__btns">
-                    <button class="sra-script__btn" v-on:click="moveDown($index)"><i class="icon-down-circled"></i></button>
-                    <button class="sra-script__btn" v-on:click="moveUp($index)"><i class="icon-up-circled"></i></button>
-                  </div>
-                </div>
-                <div class="sra-flex sra-flex--content">
-                  <div class="sra-script__type">
-                    <i v-bind:class="{'icon-code': script.type == 'snippet', 'icon-link': script.type == 'external'}"></i>
-                  </div>
-                  <div class="sra-script__snippet" v-if="script.type == 'snippet'">
-                    <textarea v-on:keyup="save" v-model="script.code" placeholder="Write your own code here."></textarea>
-                  </div>
-                  <div class="sra-script__external" v-if="script.type == 'external'">
-                    <input v-on:blur="save" type="text" v-model="script.src" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)">
-                  </div>
-                </div>
-                <div class="sra-flex sra-flex--foot">
-                  <i class="icon-cloud-flash"></i>
-                  <input class="sra-script__host" v-model="script.host" v-on:blur="save" placeholder="Target hostname. By default, target to all host.">
-                  <button class="sra-script__btn remove" v-on:click="removeScript($index)"><i class="icon-trash"></i></button>
-                </div>
-              </div>
-            </div>
-            <div>
-              
-            </div>
-          </li>
-        </ul>
+
+        <ul class="sra-scripts" id="scriptsList"></ul>
       </div>
     </div>
-    <script src="js/lib/lodash.min.js"></script>
-    <script src="js/lib/vue.js"></script>
+
+    <!-- Item template -->
+    <template id="scriptItemTemplate">
+      <li class="sra-script">
+        <div class="sra-script__plug"></div>
+        <div class="sra-script__box">
+          <div class="sra-script__content">
+            <div class="sra-flex sra-flex--head">
+              <input class="sra-script__name" type="text">
+              <div class="sra-script__btns">
+                <button class="sra-script__btn move-down" title="Move down"><i class="icon-down-circled"></i></button>
+                <button class="sra-script__btn move-up" title="Move up"><i class="icon-up-circled"></i></button>
+              </div>
+            </div>
+            <div class="sra-flex sra-flex--content">
+              <div class="sra-script__type">
+                <i class="type-icon"></i>
+              </div>
+              <div class="sra-script__snippet">
+                <textarea class="code" placeholder="Write your own code here."></textarea>
+              </div>
+              <div class="sra-script__external">
+                <input class="src" type="text" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)">
+              </div>
+            </div>
+            <div class="sra-flex sra-flex--foot">
+              <i class="icon-cloud-flash"></i>
+              <input class="sra-script__host host" placeholder="Target hostname. By default, target to all host.">
+              <button class="sra-script__btn remove" title="Delete"><i class="icon-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      </li>
+    </template>
+
     <script src="js/options.js"></script>
   </body>
 </html>

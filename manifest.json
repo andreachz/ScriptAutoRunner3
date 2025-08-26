@@ -1,14 +1,14 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "ScriptAutoRunner",
-  "description": "Injects to any Script into a Website. It can be autorun as well.",
+  "description": "Injects any script into a website. It can autorun as well.",
   "version": "0.1.0",
   "background": {
-    "scripts": ["js/background.js"]
+    "service_worker": "js/background.js"
   },
   "content_scripts": [
     {
-      "matches": ["\u003Call_urls\u003E"],
+      "matches": ["<all_urls>"],
       "js": ["js/content.js"]
     }
   ],
@@ -18,12 +18,17 @@
     "128": "img/icon.png"
   },
   "options_page": "options.html",
-  "content_security_policy": "allow-scripts; script-src 'self' 'unsafe-eval'; object-src 'self'",
-  "browser_action": {
+  "action": {
     "default_icon": "img/icon.png",
-    "default_title": "ScriptAutoRunner"
+    "default_title": "ScriptAutoRunner",
+    "default_popup": "popup.html"
   },
   "permissions": [
-    "tabs", "<all_urls>"
+    "storage",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ]
 }
