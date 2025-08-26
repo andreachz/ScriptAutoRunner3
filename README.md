@@ -43,6 +43,7 @@ This project simply adapts that excellent work for Manifest V3 while keeping the
 
 ---
 
+## Keeping the same good old features from the original repo
 
 Injects to any Script into a Website. It can be autorun as well.
 
@@ -50,7 +51,7 @@ Injects to any Script into a Website. It can be autorun as well.
 
 ## Install
 
-Download & install from Chrome Webstore. [Deprecated]
+Download & install from Chrome Webstore. [Manifest v2 deprecated]
 
 [Download](https://chrome.google.com/webstore/detail/scriptautorunner/gpgjofmpmjjopcogjgdldidobhmjmdbm)
 
