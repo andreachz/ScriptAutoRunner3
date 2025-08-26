@@ -26,7 +26,7 @@ document.addEventListener("keyup", function(event) {
 
 
 window.addEventListener("storage", (event) => {
-  if(event.key == _POPUP_STORAGE_CHANGE_KEY || 1){
+  if(event.key == _POPUP_STORAGE_CHANGE_KEY){
     window.location.reload()
   }
   console.log("Storage changed!");
