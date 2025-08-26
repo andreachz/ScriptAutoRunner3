@@ -39,7 +39,7 @@ The original extension relied on features no longer supported in MV3 and could n
 ## Acknowledgments
 
 Huge thanks to [**nakajmg**](https://github.com/nakajmg) for creating the original **ScriptAutoRunner** and maintaining it for so long.  
-This project simply adapts that excellent work for Manifest V3 while keeping the same spirit of simplicity and functionality alive.
+This project simply adapts that excellent work for Manifest V3 while keeping the same spirit of simplicity and functionality alive. Some new extra features are introduced as well.
 
 ---
 
