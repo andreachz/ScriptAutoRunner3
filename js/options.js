@@ -1,3 +1,27 @@
+var isShiftDown = false
+var isCrtlDown = false
+document.addEventListener("keydown", function(event) {
+  if (event.shiftKey) {
+    console.log("Shift is pressed!");
+    isShiftDown = true
+  }
+  if (event.ctrlKey) {
+    console.log("Shift is pressed!");
+    isCrtlDown = true
+  }
+});
+
+document.addEventListener("keyup", function(event) {
+  if (!event.shiftKey) {
+    console.log("Shift is released!");
+    isShiftDown = false
+  }
+  if (!event.ctrlKey) {
+    console.log("Shift is released!");
+    isCrtlDown = false
+  }
+});
+
 (function () {
   // Defaults & keys
   const DEFAULT_SCRIPT = {
@@ -200,6 +224,7 @@
 
       scriptsList.appendChild(li);
     });
+    renderCodemirror()
   }
 
   function renderAll() {
@@ -227,12 +252,117 @@
 
   function removeScript(index) {
     if (index < 0 || index >= state.scripts.length) return;
+    if(isShiftDown && isCrtlDown){
+      if (window.confirm('Are you sure you want to delete all?')) {
+        state.scripts=[]
+        renderList();
+        save();
+        return
+      }
+    }
+    if(isShiftDown){
+      state.scripts.splice(index, 1);
+      renderList();
+      save();
+      return
+    }
     if (window.confirm('Are you sure you want to delete?')) {
       state.scripts.splice(index, 1);
       renderList();
       save();
     }
   }
+
+  function sanitizeFilename(name, fallback = 'script') {
+    const s = (name || fallback).toString().trim() || fallback;
+    return s.replace(/[\\/:*?"<>|]+/g, '_');
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function guessExtFromSrc(src) {
+    try {
+      const p = new URL(src, location.href).pathname;
+      const m = p.match(/\.(js|mjs|cjs|ts|json|txt|css|html|md)$/i);
+      return m ? m[0] : '.js';
+    } catch {
+      return '.js';
+    }
+  }
+
+  async function downloadScript(index) {
+    if (index < 0 || index >= state.scripts.length) return;
+    const s = state.scripts[index];
+    if (!s) return;
+
+    if (s.type === 'snippet') {
+      const code = String(s.code || '');
+      const hasCode = code.trim().length > 0;
+      const base = sanitizeFilename(s.name || `Script${s.id ?? index}`);
+      const ext = hasCode ? '.js' : '.txt';
+      const blob = new Blob([code], { type: 'text/javascript;charset=utf-8' });
+      downloadBlob(blob, `${base}${ext}`);
+      return;
+    }
+
+    // type === 'external'
+    const src = (s.src || '').trim();
+    const base = sanitizeFilename(
+      (s.name || '') ||
+      (src ? src.split('/').pop().split('?')[0] : '') ||
+      `Script${s.id ?? index}`
+    );
+    const ext = guessExtFromSrc(src);
+
+    if (!src) {
+      const blob = new Blob(
+        ['// Empty "external" script: no URL set\n'],
+        { type: 'text/plain;charset=utf-8' }
+      );
+      downloadBlob(blob, `${base}.txt`);
+      return;
+    }
+
+    // Try to fetch the external script (may fail due to CORS)
+    try {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), 10000); // 10s timeout
+      const res = await fetch(src, { signal: ctl.signal, credentials: 'omit' });
+      clearTimeout(t);
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const text = await res.text();
+      const mime =
+        ext === '.json' ? 'application/json;charset=utf-8'
+        : ext === '.css' ? 'text/css;charset=utf-8'
+        : ext === '.html' ? 'text/html;charset=utf-8'
+        : 'text/javascript;charset=utf-8';
+
+      const blob = new Blob([text], { type: mime });
+      const fname = base.endsWith(ext) ? base : `${base}${ext}`;
+      downloadBlob(blob, fname);
+    } catch (err) {
+      console.warn('Could not fetch external script; falling back to URL note.', err);
+      const note =
+  `// Could not download external script due to CORS/network.
+  // You can open this URL directly to save it:
+  ${src}
+  `;
+      const blob = new Blob([note], { type: 'text/plain;charset=utf-8' });
+      downloadBlob(blob, `${base}.txt`);
+    }
+  }
+
 
   function moveUp(index) {
     if (index - 1 < 0) return;
@@ -283,6 +413,7 @@
     else if (e.target.closest('.move-up'))          moveUp(index);
     else if (e.target.closest('.move-down'))        moveDown(index);
     else if (e.target.closest('.remove'))           removeScript(index);
+    else if (e.target.closest('.download'))         downloadScript(index);
   });
 
   scriptsList.addEventListener('input', (e) => {
@@ -309,5 +440,169 @@
     // Extra sanity sync after initial render
     await loadIntoState();
     renderAll();
+
+// extras
+    setupDragAndDrop();
+
+// --- Drag & Drop: helpers ---
+function isTextFile(file) {
+  if (!file) return false;
+  const nameOk = /\.(js|mjs|cjs|ts|tsx|jsx|json|txt|md|css|scss|less|html|htm)$/i.test(file.name || '');
+  const typeOk = (file.type || '').startsWith('text') || file.type === '' || file.type === 'application/json';
+  return nameOk || typeOk;
+}
+
+function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(String(fr.result || ''));
+    fr.onerror = reject;
+    fr.readAsText(file);
+  });
+}
+
+// Create a new snippet with prefilled content
+async function addSnippetWithContent(name, content) {
+  const s = clone(DEFAULT_SCRIPT);
+  s.id = getAvailableId();
+  s.type = 'snippet';
+  s.enable = false;
+  s.name = name || `Script${s.id}`;
+  s.code = content || '';
+  state.scripts.push(s);
+  renderList();
+  await save();
+  return state.scripts.length - 1;
+}
+
+function highlightDropTarget(el, on) {
+  if (!el) return;
+  el.classList.toggle('sra-drop--over', !!on);
+}
+
+// --- Drag & Drop: core wiring ---
+function setupDragAndDrop() {
+  // Prevent the browser from navigating away on file drop
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt =>
+    app.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); })
+  );
+
+  let lastHoverBox = null;
+
+  app.addEventListener('dragover', (e) => {
+    const box = e.target.closest('.sra-script__box');
+    if (box !== lastHoverBox) {
+      highlightDropTarget(lastHoverBox, false);
+      lastHoverBox = box;
+      highlightDropTarget(lastHoverBox, true);
+    }
+  });
+
+  app.addEventListener('dragleave', () => {
+    highlightDropTarget(lastHoverBox, false);
+    lastHoverBox = null;
+  });
+
+  app.addEventListener('drop', async (e) => {
+    const files = Array.from(e.dataTransfer?.files || []).filter(isTextFile);
+    highlightDropTarget(lastHoverBox, false);
+    const box = e.target.closest('.sra-script__box');
+
+    if (!files.length) return;
+
+    if (box) {
+      // Dropped on an existing script box: merge all files into that item's code
+      const li = box.closest('li.sra-script');
+      const index = parseInt(li?.dataset?.index ?? '-1', 10);
+      if (!Number.isInteger(index) || index < 0 || index >= state.scripts.length) return;
+
+      try {
+        const texts = await Promise.all(files.map(readFileAsText));
+        const content = texts.join('\n\n/* --- next file --- */\n\n');
+
+        // Force to snippet type and set code
+        state.scripts[index].type = 'snippet';
+        state.scripts[index].code = content;
+
+        // Update UI fields in-place if present
+        const typeIcon = li.querySelector('.type-icon');
+        const snippetBox = li.querySelector('.sra-script__snippet');
+        const externalBox = li.querySelector('.sra-script__external');
+        if (typeIcon) typeIcon.className = 'type-icon icon-code';
+        if (snippetBox && externalBox) { snippetBox.style.display = ''; externalBox.style.display = 'none'; }
+        const codeArea = li.querySelector('.code');
+        if (codeArea) codeArea.value = content;
+
+        await save();
+      } catch (err) {
+        console.error('Reading dropped file failed:', err);
+        window.alert('Could not read the dropped file(s).');
+      }
+    } else {
+      // Dropped on background: create one new script per file
+      try {
+        for (const f of files) {
+          const text = await readFileAsText(f);
+          await addSnippetWithContent(f.name?.replace(/\.[^.]+$/, '') || undefined, text);
+        }
+      } catch (err) {
+        console.error('Creating scripts from dropped file(s) failed:', err);
+        window.alert('Could not create script(s) from the dropped file(s).');
+      }
+    }
+  });
+}
+
   })();
 })();
+
+
+function renderCodemirror() {
+  const editors = [];
+
+  document.querySelectorAll('textarea.code').forEach((ta) => {
+    const editor = CodeMirror.fromTextArea(ta, {
+      mode: 'javascript',
+      lineNumbers: true,
+      theme: 'default'
+    });
+
+    // Keep textarea.value in sync with CodeMirror on every edit
+    const syncEditorToTextarea = () => {
+      const val = editor.getValue();
+      if (ta.value !== val) {
+        ta.value = val;
+        // Bubble so any delegated handlers (like your state updater) see it
+        ta.dispatchEvent(new Event('input',  { bubbles: true }));
+        ta.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    };
+
+    // Initial sync (in case editor modifies formatting on load)
+    syncEditorToTextarea();
+
+    // Sync on every change in CodeMirror
+    editor.on('change', syncEditorToTextarea);
+
+    // (Optional) If you ever edit ta.value programmatically and dispatch an event,
+    // mirror it back into CodeMirror so both stay aligned.
+    const syncTextareaToEditor = () => {
+      const val = ta.value;
+      if (editor.getValue() !== val) editor.setValue(val);
+    };
+    ta.addEventListener('input',  syncTextareaToEditor);
+    ta.addEventListener('change', syncTextareaToEditor);
+
+    editors.push(editor);
+  });
+
+  // Example: get values of all code editors
+  function getAllCode() {
+    return editors.map((ed) => ed.getValue());
+  }
+
+  // (Optional) return helpers if you need them elsewhere
+  return { editors, getAllCode };
+}
+
+

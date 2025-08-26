@@ -4,8 +4,14 @@
     <meta charset="utf-8">
     <title>ScriptAutoRunner</title>
     <link rel="stylesheet" href="css/fontello-embedded.css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="css/fontello-embedded2.css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="css/base.css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="css/options.css" media="screen" charset="utf-8">
+
+    <link rel="stylesheet" href="css/codemirror.css">
+    <script src="js/codemirror/lib/codemirror.js"></script>
+    <script src="js/codemirror/mode/javascript/javascript.js"></script>
+
   </head>
   <body>
     <div class="sra-wrapper" id="app">
@@ -44,10 +50,10 @@
           <div class="sra-btn src-btn--plus">
             <i class="icon-plus"></i>
           </div>
-          <button class="sra-btn" id="addSnippetBtn">
+          <button class="sra-btn" id="addSnippetBtn" title="Add JS snippet">
             <i class="icon-code"></i>
           </button>
-          <button class="sra-btn" id="addExternalBtn">
+          <button class="sra-btn" id="addExternalBtn" title="Add external JS file from URL">
             <i class="icon-link"></i>
           </button>
         </div>
@@ -83,7 +89,8 @@
             <div class="sra-flex sra-flex--foot">
               <i class="icon-cloud-flash"></i>
               <input class="sra-script__host host" placeholder="Target hostname. By default, target to all host.">
-              <button class="sra-script__btn remove" title="Delete"><i class="icon-trash"></i></button>
+              <button class="sra-script__btn download" title="Download"><i class="icon2-download"></i></button>
+              <button class="sra-script__btn remove" title="Shift+Click: delete without confirm. Ctrl+Shift+Click: delete all"><i class="icon-trash"></i></button>
             </div>
           </div>
         </div>

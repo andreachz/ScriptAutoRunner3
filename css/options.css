@@ -100,10 +100,12 @@
   background-color: #F3D32F;
   z-index: 1;
   cursor: pointer;
+  box-shadow: -1px 0 12px 0px rgba(243, 211, 47, 0.9);
 }
 .sra-power--off {
   background-color: #656565;
   color: #F3D32F;
+  box-shadow: initial;
 }
   .sra-power .icon-flash {
     position: absolute;
@@ -215,11 +217,15 @@
 .sra-script {
   position: relative;
   border-radius: 1px;
-  width: 660px;
+  /* width: 660px; */
+  min-width: 660px;
+  width: fit-content;
   padding: 5px 10px;
   margin-bottom: 10px;
   margin-top: 10px;
   background-color: #656565;
+  box-shadow: 0 0 19px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
 }
 .sra-script--enable {
   color: #454851;
@@ -320,6 +326,9 @@
     width: 100%;
     box-sizing: border-box;
     margin-left: 30px;
+    /* border-bottom: 1px solid gray; */
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 3px;
   }
   .sra-script__btns {
     text-align: right;
@@ -370,6 +379,13 @@
     line-height: 20px;
   }
   
+  #addSnippetBtn:hover, #addExternalBtn:hover{
+    filter: brightness(150%);
+  }
+  #addSnippetBtn:active, #addExternalBtn:active{
+    filter: brightness(90%);
+  }
+
   .sra-script__snippet textarea {
     padding: 5px;
     width: 100%;
@@ -404,18 +420,50 @@
     background-color: transparent;
     border: none;
   }
+  .sra-script__btn.download {
+    color: inherit;
+    font-weight: 600;
+    background-color: transparent;
+    border: none;
+    margin-top: 3px;
+  }
 
 .sra-script__menu {
   text-align: right;
 }
-.sra-script__host {
+.sra-script.sra-script--enable .sra-script__host {
   background-color: transparent;
+  /* background-color: rgba(255, 255, 255, 0.1); */
+  border: 1px solid rgba(0, 0, 0, 0.3)!important;
+  margin-left: 4px;
   color: inherit;
+  opacity: 1;
   box-sizing: border-box;
   border: none;
   padding: 5px;
   font-size: 14px;
   line-height: 20px;
+}
+
+.sra-script .sra-script__host {
+  background-color: transparent;
+  /* background-color: rgba(255, 255, 255, 0.1); */
+  border: 1px solid rgba(0, 0, 0, 0.3)!important;
+  margin-left: 4px;
+  color: inherit;
+  opacity: 0.6;
+  box-sizing: border-box;
+  border: none;
+  padding: 5px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.sra-script__external .src::placeholder{
+  color: rgba(0, 0, 0, 0.6);
+}
+.sra-script__host::placeholder{
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .sra-flex {
@@ -438,3 +486,11 @@
   .sra-flex--foot .icon-cloud-flash {
     font-size: 18px;
   }
+
+  /* extras */
+
+  /* subtle highlight when dragging over a script box */
+.sra-script__box.sra-drop--over {
+  outline: 2px dashed rgba(0,0,0,.25);
+  outline-offset: 4px;
+}

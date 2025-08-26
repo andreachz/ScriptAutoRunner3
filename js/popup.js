@@ -20,7 +20,7 @@
   // Runtime data
   let hostname = '';
 
-  // --- Storage helpers ---
+  // --- Storage helpers localStorage API ---
   function load() {
     try {
       const raw = localStorage.getItem(storageKey);
@@ -38,9 +38,88 @@
     }
   }
 
-  function save() {
-    localStorage.setItem(storageKey, JSON.stringify(state));
+  // function save() {
+  //   localStorage.setItem(storageKey, JSON.stringify(state));
+  // }
+
+
+  // --- Storage helpers (chrome.storage.local + window.localStorage) ---
+  const STORAGE_KEY = storageKey;
+  const DEFAULT_STATE = { power: true, scripts: [], options: { ...DEFAULT_OPTIONS } };
+
+  // Promisified chrome.storage.local (safe if unavailable)
+  const cstore = {
+    get(key) {
+      return new Promise((resolve) => {
+        try {
+          if (!chrome?.storage?.local) return resolve(undefined);
+          chrome.storage.local.get(key, (res) => resolve(res?.[key]));
+        } catch { resolve(undefined); }
+      });
+    },
+    set(key, value) {
+      return new Promise((resolve) => {
+        try {
+          if (!chrome?.storage?.local) return resolve();
+          chrome.storage.local.set({ [key]: value }, () => resolve());
+        } catch { resolve(); }
+      });
+    }
+  };
+
+  // DOM localStorage helpers
+  function lGet(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : undefined;
+    } catch { return undefined; }
   }
+  function lSet(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  }
+
+  // Merge: chrome wins on conflicts; local fills gaps; defaults fill the rest
+  function mergeData(chr, loc) {
+    if (!chr && !loc) return undefined;
+    const base = chr ?? loc ?? {};
+    const other = chr ? loc : undefined;
+    return {
+      power: typeof base.power === 'boolean'
+        ? base.power
+        : (typeof other?.power === 'boolean' ? other.power : true),
+      scripts: Array.isArray(base.scripts)
+        ? base.scripts
+        : (Array.isArray(other?.scripts) ? other.scripts : []),
+      options: base.options
+        ? { ...DEFAULT_OPTIONS, ...base.options }
+        : (other?.options ? { ...DEFAULT_OPTIONS, ...other.options } : { ...DEFAULT_OPTIONS })
+    };
+  }
+
+  // async function load() {
+  //   try {
+  //     const [chr, loc] = await Promise.all([cstore.get(STORAGE_KEY), Promise.resolve(lGet(STORAGE_KEY))]);
+  //     let data = mergeData(chr, loc) ?? { ...DEFAULT_STATE };
+
+  //     // normalize into your state object
+  //     state.power   = typeof data.power === 'boolean' ? data.power : true;
+  //     state.scripts = Array.isArray(data.scripts) ? data.scripts : [];
+  //     state.options = data.options ? { ...DEFAULT_OPTIONS, ...data.options } : { ...DEFAULT_OPTIONS };
+
+  //     // sync back to BOTH stores
+  //     const payload = { power: state.power, scripts: state.scripts, options: state.options };
+  //     await Promise.all([cstore.set(STORAGE_KEY, payload), Promise.resolve(lSet(STORAGE_KEY, payload))]);
+  //   } catch {
+  //     state = { ...DEFAULT_STATE };
+  //     await Promise.all([cstore.set(STORAGE_KEY, state), Promise.resolve(lSet(STORAGE_KEY, state))]);
+  //   }
+  // }
+
+  async function save() {
+    const payload = { power: state.power, scripts: state.scripts, options: state.options };
+    await Promise.all([cstore.set(STORAGE_KEY, payload), Promise.resolve(lSet(STORAGE_KEY, payload))]);
+  }
+
 
   // --- Host matching helpers (ported from Vue methods) ---
   function isExcludeHost() {
