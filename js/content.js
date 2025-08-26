@@ -1,7 +1,9 @@
 chrome.runtime.sendMessage({ method: "SARgetLocalStorage" }, async (response) => {
   const data = response?.data;
   if (!data || !Array.isArray(data.scripts)) return;
-
+  
+  if (!data.power){return}
+  
   const hostname = location.hostname;
   const matchList = (pattern) => {
     if (!pattern || pattern === "any") return true;
