@@ -263,7 +263,8 @@ document.addEventListener("keyup", function(event) {
         return
       }
     }
-    if(isShiftDown){
+    // console.log(state)
+    if(isShiftDown || (!state.scripts[index].code.length && !state.scripts[index].src.length && !state.scripts[index].host.length)){
       state.scripts.splice(index, 1);
       renderList();
       save();
