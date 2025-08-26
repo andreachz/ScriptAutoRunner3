@@ -1,6 +1,39 @@
-# ⚠️ This extension relies on features that are no longer supported under [Manifest V3](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3). As a result, it can no longer be used or maintained. Thank you for using this extension for such a long time👋
+<!-- # ⚠️ This extension relies on features that are no longer supported under [Manifest V3](https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3). As a result, it can no longer be used or maintained. Thank you for using this extension for such a long time👋 -->
 
-# ScriptAutoRunner
+# ScriptAutoRunner3
+
+**ScriptAutoRunner3** is a fork of the original [ScriptAutoRunner](https://github.com/nakajmg/ScriptAutoRunner), updated to work under **Chrome Manifest V3**.  
+
+The original extension relied on features no longer supported in MV3 and could not be maintained further. This fork brings the same familiar functionality back, adapted to the new extension platform.
+
+---
+
+## What’s New in ScriptAutoRunner3
+
+- **Manifest V3 support**  
+  Migrated the extension to comply with MV3 requirements.  
+
+- **Switched from Vue.js 1.0 to vanilla JavaScript**  
+  The legacy Vue 1.0 framework is no longer used.  
+  Functionality was rewritten in plain JavaScript for long-term maintainability and compatibility.  
+  Effort was made to keep the behavior and interface as close as possible to the original.  
+
+- **Manifest and API updates**  
+  Adjusted background scripts, permissions, and other extension internals to meet MV3 standards.  
+
+- **Keeping it simple**
+  Familiar workflow preserved - designed as a drop-in replacement for the original extension.
+  Lightweight, dependency-free (no Vue.js required).  
+
+---
+
+## Acknowledgments
+
+Huge thanks to [**nakajmg**](https://github.com/nakajmg) for creating the original **ScriptAutoRunner** and maintaining it for so long.  
+This project simply adapts that excellent work for Manifest V3 while keeping the same spirit of simplicity and functionality alive.
+
+---
+
 
 Injects to any Script into a Website. It can be autorun as well.
 
