@@ -1,5 +1,7 @@
 const _POPUP_STORAGE_CHANGE_KEY = 'POPUP_STORAGE_CHANGE_KEY'
 const SAR_PREFIX = '__SAR_DATA::';
+let moveFromIndex = -1;
+let oldScriptsDisposition;
 
 var isShiftDown = false
 var isCrtlDown = false
@@ -224,6 +226,8 @@ window.addEventListener("storage", (event) => {
   function renderList() {
     
     renderScriptsCounterIndicator()
+
+    
     
     scriptsList.innerHTML = '';
     state.scripts.forEach((script, index) => {
@@ -250,9 +254,22 @@ window.addEventListener("storage", (event) => {
       if (srcInput)  srcInput.value  = script.src || '';
       hostInput.value = script.host || '';
 
+      // if(moveFromIndex!=-1 && moveFromIndex==index){
+      //   li.style.transform='scale(105%)'
+      //   li.style.zIndex='100'
+      //   li.style.opacity='0.6'
+      // }
+
       scriptsList.appendChild(li);
     });
     renderCodemirror()
+
+
+    if(moveFromIndex!=-1){
+      document.querySelectorAll('.sra-script')[moveFromIndex].style.transform='scale(105%)'
+      document.querySelectorAll('.sra-script')[moveFromIndex].style.zIndex='100'
+      document.querySelectorAll('.sra-script')[moveFromIndex].style.opacity='0.6'
+    }
   }
 
   function renderAll() {
@@ -420,6 +437,19 @@ function genericDownload(e, index) {
   }
 
 
+  function moveTo(fromIndex, toIndex) {
+    if (
+      fromIndex < 0 || fromIndex >= state.scripts.length ||
+      toIndex   < 0 || toIndex   >= state.scripts.length
+    ) return;
+
+    const [moved] = state.scripts.splice(fromIndex, 1);
+    state.scripts.splice(toIndex, 0, moved);
+
+    renderList();
+    save();
+  }
+
   function moveUp(index) {
     if (index - 1 < 0) return;
     [state.scripts[index - 1], state.scripts[index]] = [state.scripts[index], state.scripts[index - 1]];
@@ -472,6 +502,76 @@ function genericDownload(e, index) {
     else if (e.target.closest('.remove'))           removeScript(index, e);
     else if (e.target.closest('.download'))         genericDownload(e, index);
   });
+  
+  scriptsList.addEventListener('mousedown', (e) => {
+    const li = e.target.closest('li.sra-script'); if (!li) return;
+    const index = parseInt(li.dataset.index, 10); if (Number.isNaN(index)) return;
+
+    if (e.target.closest('.sra-script__plug'))      return;
+    else if (e.target.closest('.move-up'))          {moveFromIndex=index; oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script')) }
+    else if (e.target.closest('.move-down'))        {moveFromIndex=index; oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script')) };
+    // else if (e.target.closest('.remove'))           removeScript(index, e);
+    // else if (e.target.closest('.download'))         genericDownload(e, index);
+  });
+
+  scriptsList.addEventListener('mouseup', (e) => {
+    resetMoveFromIndex()
+  });
+  scriptsList.addEventListener('mouseleave', (e) => {
+    resetMoveFromIndex()
+  });
+
+  function resetMoveFromIndex(){
+    document.querySelectorAll('.sra-script')[moveFromIndex].style.transform=''
+    document.querySelectorAll('.sra-script')[moveFromIndex].style.zIndex=''
+    document.querySelectorAll('.sra-script')[moveFromIndex].style.opacity=''
+    moveFromIndex=-1
+  }
+
+document.addEventListener('mousemove', e => {
+  if (moveFromIndex === -1) return;
+
+  const s = oldScriptsDisposition;
+  if (!s || !s.length) return;
+
+  const y = e.clientY;
+
+  // before first
+  const firstTop = s[0].getBoundingClientRect().top;
+  if (y < firstTop) {
+    moveTo(moveFromIndex, 0);
+    moveFromIndex = 0;
+    oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-script'));
+    return;
+  }
+
+  // between items
+  for (let i = 1; i < s.length; i++) {
+    const prevTop = s[i - 1].getBoundingClientRect().top;
+    const nextTop = s[i].getBoundingClientRect().top;
+    if (y >= prevTop && y < nextTop) {
+      moveTo(moveFromIndex, i - 1);
+      moveFromIndex = i - 1;
+      oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-script'));
+      return;
+    }
+  }
+  // alert(1)
+  // AFTER LAST: use the bottom half of the last item
+  const lastRect = s[s.length - 1].getBoundingClientRect();
+  const afterThreshold = (lastRect.top + lastRect.bottom) / 2; // midpoint
+  // const afterThreshold = (lastRect.bottom); // midpoint
+  if (y >= afterThreshold) {
+    // s.length means "insert after last"
+    moveTo(moveFromIndex, s.length - 1);
+    moveFromIndex = s.length - 1;
+    oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-script'));
+    return;
+  }
+});
+
+
+
 
   scriptsList.addEventListener('input', (e) => {
     const li = e.target.closest('li.sra-script'); if (!li) return;
