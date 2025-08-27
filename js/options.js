@@ -505,8 +505,9 @@ function genericDownload(e, index) {
     const index = parseInt(li.dataset.index, 10); if (Number.isNaN(index)) return;
 
     if (e.target.closest('.sra-script__plug'))      return;
-    else if (e.target.closest('.move-up'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  }
-    else if (e.target.closest('.move-down'))        {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  };
+    else if (e.target.closest('.move-drag'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  }
+    // else if (e.target.closest('.move-up'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  }
+    // else if (e.target.closest('.move-down'))        {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  };
     // else if (e.target.closest('.remove'))           removeScript(index, e);
     // else if (e.target.closest('.download'))         genericDownload(e, index);
   });
@@ -519,7 +520,7 @@ function genericDownload(e, index) {
   });
 
   function setMove(index){
-    if(index){
+    if(index!=null){
     moveFromIndex=index; 
     moveToIndex=index;
     }
@@ -540,6 +541,7 @@ function genericDownload(e, index) {
     moveToIndex=-1
     moveFromIndex=-1
   }
+
 
 document.addEventListener('mousemove', e => {
   if (moveFromIndex === -1) return;
@@ -577,7 +579,7 @@ document.addEventListener('mousemove', e => {
   // alert(1)
   // AFTER LAST: use the bottom half of the last item
   const lastRect = s[s.length - 1].getBoundingClientRect();
-  const afterThreshold = (lastRect.top + lastRect.bottom) / 2; // midpoint
+  const afterThreshold = (lastRect.top + lastRect.bottom) / 4; // midpoint
   // const afterThreshold = (lastRect.bottom); // midpoint
   if (y >= afterThreshold) {
     // s.length means "insert after last"
