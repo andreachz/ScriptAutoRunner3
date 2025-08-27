@@ -1,6 +1,7 @@
 const _POPUP_STORAGE_CHANGE_KEY = 'POPUP_STORAGE_CHANGE_KEY'
 const SAR_PREFIX = '__SAR_DATA::';
 let moveFromIndex = -1;
+let moveToIndex = -1;
 let oldScriptsDisposition;
 
 var isShiftDown = false
@@ -265,11 +266,7 @@ window.addEventListener("storage", (event) => {
     renderCodemirror()
 
 
-    if(moveFromIndex!=-1){
-      document.querySelectorAll('.sra-script')[moveFromIndex].style.transform='scale(105%)'
-      document.querySelectorAll('.sra-script')[moveFromIndex].style.zIndex='100'
-      document.querySelectorAll('.sra-script')[moveFromIndex].style.opacity='0.6'
-    }
+    setMove(null)
   }
 
   function renderAll() {
@@ -508,23 +505,39 @@ function genericDownload(e, index) {
     const index = parseInt(li.dataset.index, 10); if (Number.isNaN(index)) return;
 
     if (e.target.closest('.sra-script__plug'))      return;
-    else if (e.target.closest('.move-up'))          {moveFromIndex=index; oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script')) }
-    else if (e.target.closest('.move-down'))        {moveFromIndex=index; oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script')) };
+    else if (e.target.closest('.move-up'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  }
+    else if (e.target.closest('.move-down'))        {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  };
     // else if (e.target.closest('.remove'))           removeScript(index, e);
     // else if (e.target.closest('.download'))         genericDownload(e, index);
   });
 
   scriptsList.addEventListener('mouseup', (e) => {
-    resetMoveFromIndex()
+    resetMove()
   });
   scriptsList.addEventListener('mouseleave', (e) => {
-    resetMoveFromIndex()
+    resetMove()
   });
 
-  function resetMoveFromIndex(){
-    document.querySelectorAll('.sra-script')[moveFromIndex].style.transform=''
-    document.querySelectorAll('.sra-script')[moveFromIndex].style.zIndex=''
-    document.querySelectorAll('.sra-script')[moveFromIndex].style.opacity=''
+  function setMove(index){
+    if(index){
+    moveFromIndex=index; 
+    moveToIndex=index;
+    }
+    if(moveToIndex!=-1){
+      document.querySelectorAll('.sra-script')[moveToIndex].style.transform='scale(105%)'
+      document.querySelectorAll('.sra-script')[moveToIndex].style.zIndex='100'
+      document.querySelectorAll('.sra-script')[moveToIndex].style.opacity='0.9'
+      document.querySelectorAll('.sra-script')[moveToIndex].style.boxShadow='0 0 0 4px white'
+    }
+  }
+  function resetMove(){
+    if(moveToIndex!=-1){
+    document.querySelectorAll('.sra-script')[moveToIndex].style.transform=''
+    document.querySelectorAll('.sra-script')[moveToIndex].style.zIndex=''
+    document.querySelectorAll('.sra-script')[moveToIndex].style.opacity=''
+    document.querySelectorAll('.sra-script')[moveToIndex].style.boxShadow=''
+    }
+    moveToIndex=-1
     moveFromIndex=-1
   }
 
@@ -539,7 +552,9 @@ document.addEventListener('mousemove', e => {
   // before first
   const firstTop = s[0].getBoundingClientRect().top;
   if (y < firstTop) {
-    moveTo(moveFromIndex, 0);
+    moveToIndex = 0
+    if(moveFromIndex!=moveToIndex)
+    moveTo(moveFromIndex, moveToIndex);
     moveFromIndex = 0;
     oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-script'));
     return;
@@ -550,8 +565,11 @@ document.addEventListener('mousemove', e => {
     const prevTop = s[i - 1].getBoundingClientRect().top;
     const nextTop = s[i].getBoundingClientRect().top;
     if (y >= prevTop && y < nextTop) {
-      moveTo(moveFromIndex, i - 1);
+      moveToIndex = i - 1
+      if(moveFromIndex!=moveToIndex)
+      moveTo(moveFromIndex, moveToIndex);
       moveFromIndex = i - 1;
+      
       oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-script'));
       return;
     }
@@ -563,7 +581,9 @@ document.addEventListener('mousemove', e => {
   // const afterThreshold = (lastRect.bottom); // midpoint
   if (y >= afterThreshold) {
     // s.length means "insert after last"
-    moveTo(moveFromIndex, s.length - 1);
+    moveToIndex = s.length - 1
+    if(moveFromIndex!=moveToIndex)
+    moveTo(moveFromIndex, moveToIndex);
     moveFromIndex = s.length - 1;
     oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-script'));
     return;
