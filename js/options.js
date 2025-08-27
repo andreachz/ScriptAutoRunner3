@@ -1,5 +1,5 @@
 const _POPUP_STORAGE_CHANGE_KEY = 'POPUP_STORAGE_CHANGE_KEY'
-const SAR_PREFIX = '__SAR_DATA';
+const SAR_PREFIX = '__SAR_DATA::';
 
 var isShiftDown = false
 var isCrtlDown = false
