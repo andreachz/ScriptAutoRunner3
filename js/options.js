@@ -1,4 +1,5 @@
 const _POPUP_STORAGE_CHANGE_KEY = 'POPUP_STORAGE_CHANGE_KEY'
+const SAR_PREFIX = '__SAR_DATA';
 
 var isShiftDown = false
 var isCrtlDown = false
@@ -22,6 +23,10 @@ document.addEventListener("keyup", function(event) {
     console.log("Shift is released!");
     isCrtlDown = false
   }
+});
+
+document.getElementById("info-btn").addEventListener("click", function () {
+  alert("ScriptAutoRunner3 \n\nThis fork (26 Aug, 2025):\nhttps://github.com/andreachz/ScriptAutoRunner3\n\nOriginal fork (Sep 16, 2015 - Jan 11, 2025):\nhttps://github.com/nakajmg/ScriptAutoRunner");
 });
 
 
@@ -273,7 +278,9 @@ window.addEventListener("storage", (event) => {
     save();
   }
 
-  function removeScript(index, isShiftDown=false, isCrtlDown=false) {
+  function removeScript(index, e) {
+    let isShiftDown=e.shiftKey
+    let isCrtlDown=e.ctrlKey
     if (index < 0 || index >= state.scripts.length) return;
     if(isShiftDown && isCrtlDown){
       if (window.confirm('Are you sure you want to delete all?')) {
@@ -322,6 +329,31 @@ window.addEventListener("storage", (event) => {
       return '.js';
     }
   }
+
+function genericDownload(e, index) {
+  if (e.shiftKey) {
+    const sarLocal = lstore.get(STORAGE_KEY);
+    
+    if (!sarLocal) return; // no content to save
+    
+    const content = SAR_PREFIX+JSON.stringify(sarLocal)
+
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'SAR_data_export.txt'; // pick a file name here
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url); // clean up
+  } else {
+    downloadScript(index);
+  }
+}
+
 
   async function downloadScript(index) {
     if (index < 0 || index >= state.scripts.length) return;
@@ -437,8 +469,8 @@ window.addEventListener("storage", (event) => {
     if (e.target.closest('.sra-script__plug'))      togglePowerPerScript(index);
     else if (e.target.closest('.move-up'))          moveUp(index);
     else if (e.target.closest('.move-down'))        moveDown(index);
-    else if (e.target.closest('.remove'))           removeScript(index, e.shiftKey, e.ctrlKey);
-    else if (e.target.closest('.download'))         downloadScript(index);
+    else if (e.target.closest('.remove'))           removeScript(index, e);
+    else if (e.target.closest('.download'))         genericDownload(e, index);
   });
 
   scriptsList.addEventListener('input', (e) => {
@@ -528,12 +560,46 @@ function setupDragAndDrop() {
     lastHoverBox = null;
   });
 
+  
+
+  async function importSarFile(file) {
+    
+    // Read text and strip BOM
+    const text = (await file.text()).replace(/^\uFEFF/, '');
+
+    if (!text.startsWith(SAR_PREFIX)) return false;
+
+    const payload = text.slice(SAR_PREFIX.length).trimStart();
+
+    // Optional: validate payload if it's JSON
+    try { JSON.parse(payload); } catch(e) {console.error(e); return false; }
+
+    setUnified(STORAGE_KEY, JSON.parse(payload));
+    return true;
+  }
+
   app.addEventListener('drop', async (e) => {
     const files = Array.from(e.dataTransfer?.files || []).filter(isTextFile);
     highlightDropTarget(lastHoverBox, false);
     const box = e.target.closest('.sra-script__box');
 
     if (!files.length) return;
+
+    try {
+        for (const file of files) {
+          const ok = await importSarFile(file);
+          if (ok) {
+            // Optional: feedback toast/snackbar
+            // showToast('Imported SAR data, reloading...');
+            window.location.reload();
+            return;
+          }
+        }
+        console.warn('No valid __SAR_DATA file found in dropped files.');
+      } catch (err) {
+        console.error('Failed to import SAR data:', err);
+      }
+    
 
     if (box) {
       // Dropped on an existing script box: merge all files into that item's code

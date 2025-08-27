@@ -17,6 +17,7 @@
     <div class="sra-wrapper" id="app">
       <div class="sra-setting">
         <i class="icon-cog" id="settingsToggle"></i>
+        <h4 style="display: inline; margin-left: 15px; cursor: pointer;" id="info-btn">?</h4>
       </div>
 
       <div class="sra-setting__content" id="settingsPanel">
@@ -63,7 +64,7 @@
         </div>
         
         <ul class="sra-scripts" id="scriptsList"></ul>
-
+        <div style="height: 80px;"></div>
       </div>
     </div>
 
@@ -76,8 +77,8 @@
             <div class="sra-flex sra-flex--head">
               <input class="sra-script__name" type="text">
               <div class="sra-script__btns">
-                <button class="sra-script__btn move-down" title="Move down"><i class="icon-down-circled"></i></button>
                 <button class="sra-script__btn move-up" title="Move up"><i class="icon-up-circled"></i></button>
+                <button class="sra-script__btn move-down" title="Move down"><i class="icon-down-circled"></i></button>
               </div>
             </div>
             <div class="sra-flex sra-flex--content">
@@ -93,14 +94,15 @@
             </div>
             <div class="sra-flex sra-flex--foot">
               <i class="icon-cloud-flash"></i>
-              <input class="sra-script__host host" placeholder="Target hostname. By default, target to all host.">
-              <button class="sra-script__btn download" title="Download"><i class="icon2-download"></i></button>
+              <input class="sra-script__host host" placeholder="Target hostnames, split by comma. By default, target to all host.">
+              <button class="sra-script__btn download" title="Download script. Shift+Click: export all data"><i class="icon2-download"></i></button>
               <button class="sra-script__btn remove" title="Shift+Click: delete without confirm. Ctrl+Shift+Click: delete all"><i class="icon-trash"></i></button>
             </div>
           </div>
         </div>
       </li>
     </template>
+    
 
     <script src="js/options.js"></script>
   </body>
