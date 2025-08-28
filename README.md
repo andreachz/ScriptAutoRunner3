@@ -27,12 +27,13 @@ The original extension relied on features no longer supported in MV3 and could n
 
 - **New features for improved UI and usability**  
   - Added colored syntax highlighting for JavaScript code.  
-  - Added drag-and-drop support for easy import of `.js` files.  
-  - Added script download button.  
-  - Added deletion options with key combinations.  
-  - Visual improvements and bugfixes.  
+  - Added drag-and-drop support for easy import of .js files.  
+  - Added button for script dowload or full data export.  
+  - Added drag-and-drop support for moving and rearranging scripts.
+  - Added deletion options with key combinations on delete button.  
+  - UI/UX visual improvements and bugfixes.  
 
-![](ss/06.png)
+![](ss/07.png)
 
 ---
 
