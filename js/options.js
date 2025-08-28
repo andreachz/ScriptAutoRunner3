@@ -3,7 +3,7 @@ const SAR_PREFIX = '__SAR_DATA::';
 let moveFromIndex = -1;
 let moveToIndex = -1;
 let oldScriptsDisposition;
-
+const DRAG_MOVE_V2 = true
 
 
 document.getElementById("info-btn").addEventListener("click", function () {
@@ -494,9 +494,9 @@ function genericDownload(e, index) {
     const index = parseInt(li.dataset.index, 10); if (Number.isNaN(index)) return;
 
     if (e.target.closest('.sra-script__plug'))        return;
-    else if (e.target.closest('.move-drag'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  }
-    // else if (e.target.closest('.move-up'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  }
-    // else if (e.target.closest('.move-down'))        {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  };
+    else if (e.target.closest('.move-drag'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
+    // else if (e.target.closest('.move-up'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
+    // else if (e.target.closest('.move-down'))        {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  };
     // else if (e.target.closest('.remove'))           removeScript(index, e);
     // else if (e.target.closest('.download'))         genericDownload(e, index);
   });
@@ -517,10 +517,26 @@ function setMove(index) {
   if (moveToIndex != -1) {
     document
       .querySelectorAll('.sra-script')
-      [moveToIndex].classList.add('active-move');
+      [moveToIndex].classList.add(DRAG_MOVE_V2?'active-move-inplace':'active-move-v1');
       document.querySelector('#backdrop-panel').hidden = false
       document.querySelector('#backdrop-panel').style.cursor = 'grabbing'
+
+      if(DRAG_MOVE_V2){
+        if(!document.querySelector('#tempdrag')){
+          let tempdrag = document.querySelectorAll('.sra-script')[moveFromIndex].cloneNode(true)
+          tempdrag.id = 'tempdrag'
+          tempdrag.classList.remove('active-move-inplace')
+          tempdrag.classList.add('active-move-v2')
+          tempdrag.style.listStyleType='none'
+          document.body.appendChild(tempdrag)
+          draggingTempdrag(null, moveFromIndex)
+        }
+      }
   }
+
+
+
+
 
 
 
@@ -530,21 +546,51 @@ function resetMove() {
   if (moveToIndex != -1) {
     document
       .querySelectorAll('.sra-script')
-      [moveToIndex].classList.remove('active-move');
+      [moveToIndex].classList.remove(DRAG_MOVE_V2?'active-move-inplace':'active-move-v1');
   }
   moveToIndex = -1;
   moveFromIndex = -1;
   document.querySelector('#backdrop-panel').hidden = true
   document.querySelector('#backdrop-panel').style.cursor = ''
+  if(document.querySelector('#tempdrag')){
+    document.querySelector('#tempdrag').remove()
+  }
 }
 
+function draggingTempdrag(e, index){
+    let tempdrag = document.querySelector('#tempdrag')
+    
+  if(tempdrag){
+    let target = document.querySelectorAll('.sra-scripts .sra-script')[index]
 
+    let dragBtn = target.querySelector(".move-drag")
+
+    let liRect = target.getBoundingClientRect()
+    let btnRect = dragBtn.getBoundingClientRect()
+
+    let relativeX = btnRect.left - liRect.left
+    let relativeY = btnRect.top - liRect.top
+    // move tempdrag with mouse
+    tempdrag.style.pointerEvents = 'none'; // so it doesn't block other elements
+    if(e){
+    tempdrag.style.left = (e.clientX - relativeX - 25) + 'px';
+    tempdrag.style.top = (e.clientY - relativeY - 15) + 'px';
+    }
+    else{
+      tempdrag.style.left = (liRect.left - 15)+'px'
+      tempdrag.style.top = (liRect.top)+'px'
+    }
+  }
+}
 
 document.addEventListener('mousemove', e => {
   if (moveFromIndex === -1) return;
 
   const s = oldScriptsDisposition;
   if (!s || !s.length) return;
+
+  if(DRAG_MOVE_V2)
+  draggingTempdrag(e, moveFromIndex)
 
   const y = e.clientY;
 
@@ -555,7 +601,7 @@ document.addEventListener('mousemove', e => {
     if(moveFromIndex!=moveToIndex)
     moveTo(moveFromIndex, moveToIndex);
     moveFromIndex = 0;
-    oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-script'));
+    oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-scripts .sra-script'));
     return;
   }
 
@@ -569,7 +615,7 @@ document.addEventListener('mousemove', e => {
       moveTo(moveFromIndex, moveToIndex);
       moveFromIndex = i - 1;
       
-      oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-script'));
+      oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-scripts .sra-script'));
       return;
     }
   }
@@ -586,7 +632,7 @@ document.addEventListener('mousemove', e => {
     if(moveFromIndex!=moveToIndex)
     moveTo(moveFromIndex, moveToIndex);
     moveFromIndex = s.length - 1;
-    oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-script'));
+    oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-scripts .sra-script'));
     return;
   }
 });
@@ -773,7 +819,7 @@ function setupDragAndDrop() {
 function renderCodemirror() {
   const editors = [];
 
-  document.querySelectorAll('textarea.code').forEach((ta) => {
+  document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {
     const editor = CodeMirror.fromTextArea(ta, {
       mode: 'javascript',
       lineNumbers: true,

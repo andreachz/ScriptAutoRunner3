@@ -231,12 +231,31 @@
 }
 
 
-.sra-script.active-move {
+.sra-script.active-move-v1 {
   transform: scale(1.05);
   z-index: 100;
   opacity: 0.9;
   box-shadow: 0 0 0px 4px white, 0 0 40px 2px black;
   /* border: 4px solid white */
+}
+
+.sra-script.active-move-inplace * {
+  opacity: 0;
+}
+.sra-script.active-move-inplace {
+  border: 1px dashed white;
+  background-color: transparent;
+}
+
+.sra-script.active-move-v2 {
+  /* opacity: 0.1; */
+  position: fixed;
+  top: 0;
+  right: 0;
+  transform: scale(1.03);
+  z-index: 100;
+  opacity: 0.9;
+  box-shadow: 0 0 0px 4px white, 0 0 40px 2px black;
 }
 
 .sra-script--enable {
