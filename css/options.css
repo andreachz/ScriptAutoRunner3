@@ -552,3 +552,9 @@
 .dragging-cursor, .sra-script.dragging * {
   cursor: grabbing !important;
 }
+
+.disabled-item{
+  opacity: 0.4;
+  filter: saturate(0);
+  pointer-events: none;
+}

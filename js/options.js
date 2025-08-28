@@ -216,6 +216,13 @@ window.addEventListener("storage", (event) => {
       nameInput.value = script.name || '';
       nameInput.title = `#${index} (${script.type}) "${script.name}"`
 
+      if(index == 0){
+        li.querySelector('.move-up').classList.add('disabled-item')
+      }
+      if(index == state.scripts.length-1){
+        li.querySelector('.move-down').classList.add('disabled-item')
+      }
+
       const typeIcon = li.querySelector('.type-icon');
       const snippetBox = li.querySelector('.sra-script__snippet');
       const externalBox = li.querySelector('.sra-script__external');

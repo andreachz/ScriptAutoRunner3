@@ -16,7 +16,7 @@ textarea.monaco {
   border: 1px solid rgba(0, 0, 0, 0.3); /* optional styling */
   resize: both;        /* or 'vertical' */
   overflow: auto;      /* required for resize handle to show */
-  min-width: 630px;
+  min-width: 730px;
   width: 700px;
   /* background: transparent; */
 }
