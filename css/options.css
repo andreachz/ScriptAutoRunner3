@@ -22,7 +22,7 @@
     margin: auto;
     display: none;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 3;
+    z-index: 30;
     display: none;
   }
   .sra-setting__container {

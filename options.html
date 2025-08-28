@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/fontello-embedded2.css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="css/base.css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="css/options.css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="css/monaco.css" media="screen" charset="utf-8">
 
     <link rel="stylesheet" href="css/codemirror.css">
     <script src="js/codemirror/lib/codemirror.js"></script>
@@ -29,11 +30,23 @@
               <span id="settingsClose"><i class="icon-cancel-circled"></i></span>
             </div>
             <div class="sra-setting__main">
+              
               <div class="sra-flex">
                 <span><i class="icon-cloud-flash"></i></span>
                 <span> Exclude hostname</span>
               </div>
               <textarea id="excludeText" placeholder="Exclude hostnames, split by comma" name="exclude__text"></textarea>
+              <hr>
+              <div class="">
+                <span><i class="icon2-doc-text"></i></span>
+                <span> Choose editor</span>
+
+                <!-- selector -->
+                <select id="editorSelect" style="margin-left:.5rem">
+                  <option value="monaco">Monaco</option>
+                  <option value="codemirror">CodeMirror</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -87,7 +100,7 @@
                 <i class="type-icon"></i>
               </div>
               <div class="sra-script__snippet">
-                <textarea class="code" placeholder="Write your own code here." name="script__snippet"></textarea>
+                <textarea class="code monaco" placeholder="Write your own code here." name="script__snippet"></textarea>
               </div>
               <div class="sra-script__external">
                 <input class="src" type="text" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)" name="script__external">
@@ -109,6 +122,12 @@
     </template>
     
     <div id="backdrop-panel" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: transparent; z-index: 1000" hidden></div>
+    <script src="js/monaco-editor/min/vs/loader.js"></script>
+    <script src="js/monaco.js"></script>
+    
+    
+
     <script src="js/options.js"></script>
+    
   </body>
 </html>

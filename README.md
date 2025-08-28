@@ -26,7 +26,7 @@ The original extension relied on features no longer supported in MV3 and could n
   Lightweight, dependency-free (no Vue.js required).  
 
 - **New features for improved UI and usability**  
-  - Added colored syntax highlighting for JavaScript code.  
+  - Added Monaco and CodeMirror support for colored code syntax highlighting and coding tools.  
   - Added drag-and-drop support for easy import of .js files.  
   - Added button for script dowload or full data export.  
   - Added drag-and-drop support for moving and rearranging scripts.

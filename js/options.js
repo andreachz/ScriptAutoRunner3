@@ -4,6 +4,7 @@ let moveFromIndex = -1;
 let moveToIndex = -1;
 let oldScriptsDisposition;
 const DRAG_MOVE_V2 = true
+const SAR_EDITOR = '_SAR_EDITOR'
 
 
 document.getElementById("info-btn").addEventListener("click", function () {
@@ -240,13 +241,35 @@ window.addEventListener("storage", (event) => {
     });
 
     renderScriptsCounterIndicator()
-    renderCodemirror()
+    
+    renderEditor()
     setMove(null)
 
     setBtnsTooltips()
 
 
   }
+
+  function editorSelector(){
+  // Grab the select element
+    const editorSelect = document.getElementById('editorSelect');
+
+    // --- Load saved choice (default to "monaco") ---
+    const saved = localStorage.getItem(SAR_EDITOR) || 'monaco'; // monaco | codemirror
+    editorSelect.value = saved;
+
+    // --- Apply the editor selection immediately ---
+    // applyEditorSelection(saved);   // <== your existing function that sets up monaco/codemirror
+
+    // --- Listen for changes ---
+    editorSelect.addEventListener('change', (e) => {
+      const choice = e.target.value; // "monaco" or "codemirror"
+      localStorage.setItem(SAR_EDITOR, choice);
+      renderList()
+    });
+  }
+  editorSelector()
+
 
   function setBtnsTooltips(){
     document.querySelectorAll('.sra-script__btn.download').forEach((el) => {
@@ -815,8 +838,19 @@ function setupDragAndDrop() {
   })();
 })();
 
+function renderEditor(){
+  // choose one
 
-function renderCodemirror() {
+  if(localStorage.getItem(SAR_EDITOR) == 'codemirror'){
+    renderCodeMirror()
+  }
+  else{
+    renderMonaco()
+  }
+  
+  
+}
+function renderCodeMirror() {
   const editors = [];
 
   document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {

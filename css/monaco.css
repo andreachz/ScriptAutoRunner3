@@ -1,0 +1,21 @@
+/* Make the original textarea invisible but present,
+    so things like form validation can still reference it if needed. */
+textarea.monaco {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+.monaco-wrapper {
+  /* margin: 0.5rem 0 1rem; */
+}
+.monaco-container {
+  height: 100px;          /* adjust per use-case */
+  border: 1px solid rgba(0, 0, 0, 0.3); /* optional styling */
+  resize: both;        /* or 'vertical' */
+  overflow: auto;      /* required for resize handle to show */
+  min-width: 630px;
+  /* background: transparent; */
+}
