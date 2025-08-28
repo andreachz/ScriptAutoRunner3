@@ -4,29 +4,7 @@ let moveFromIndex = -1;
 let moveToIndex = -1;
 let oldScriptsDisposition;
 
-var isShiftDown = false
-var isCrtlDown = false
-document.addEventListener("keydown", function(event) {
-  if (event.shiftKey) {
-    console.log("Shift is pressed!");
-    isShiftDown = true
-  }
-  if (event.ctrlKey) {
-    console.log("Shift is pressed!");
-    isCrtlDown = true
-  }
-});
 
-document.addEventListener("keyup", function(event) {
-  if (!event.shiftKey) {
-    console.log("Shift is released!");
-    isShiftDown = false
-  }
-  if (!event.ctrlKey) {
-    console.log("Shift is released!");
-    isCrtlDown = false
-  }
-});
 
 document.getElementById("info-btn").addEventListener("click", function () {
   alert("ScriptAutoRunner3 \n\nThis fork (26 Aug, 2025):\nhttps://github.com/andreachz/ScriptAutoRunner3\n\nOriginal fork (Sep 16, 2015 - Jan 11, 2025):\nhttps://github.com/nakajmg/ScriptAutoRunner");
@@ -226,10 +204,6 @@ window.addEventListener("storage", (event) => {
 
   function renderList() {
     
-    renderScriptsCounterIndicator()
-
-    
-    
     scriptsList.innerHTML = '';
     state.scripts.forEach((script, index) => {
       const li = tpl.content.firstElementChild.cloneNode(true);
@@ -239,6 +213,7 @@ window.addEventListener("storage", (event) => {
 
       const nameInput = li.querySelector('.sra-script__name');
       nameInput.value = script.name || '';
+      nameInput.title = `#${index} (${script.type}) "${script.name}"`
 
       const typeIcon = li.querySelector('.type-icon');
       const snippetBox = li.querySelector('.sra-script__snippet');
@@ -263,10 +238,23 @@ window.addEventListener("storage", (event) => {
 
       scriptsList.appendChild(li);
     });
+
+    renderScriptsCounterIndicator()
     renderCodemirror()
-
-
     setMove(null)
+
+    setBtnsTooltips()
+
+
+  }
+
+  function setBtnsTooltips(){
+    document.querySelectorAll('.sra-script__btn.download').forEach((el) => {
+      el.title = '[Click] to download script\n[Shift+Click] to export all data'
+    })
+    document.querySelectorAll('.sra-script__btn.remove').forEach((el) => {
+      el.title = '[Click] to delete\n[Shift+Click] to delete without confirm\n[Ctrl+Shift+Click] to delete all'
+    })
   }
 
   function renderAll() {
@@ -373,6 +361,7 @@ function genericDownload(e, index) {
     if (index < 0 || index >= state.scripts.length) return;
     const s = state.scripts[index];
     if (!s) return;
+    if (!s.code && !s.src) {alert('Nothing to download: script is empty'); return};
 
     if (s.type === 'snippet') {
       const code = String(s.code || '');
@@ -504,7 +493,7 @@ function genericDownload(e, index) {
     const li = e.target.closest('li.sra-script'); if (!li) return;
     const index = parseInt(li.dataset.index, 10); if (Number.isNaN(index)) return;
 
-    if (e.target.closest('.sra-script__plug'))      return;
+    if (e.target.closest('.sra-script__plug'))        return;
     else if (e.target.closest('.move-drag'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  }
     // else if (e.target.closest('.move-up'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  }
     // else if (e.target.closest('.move-down'))        {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-script'));  };
@@ -512,35 +501,43 @@ function genericDownload(e, index) {
     // else if (e.target.closest('.download'))         genericDownload(e, index);
   });
 
-  scriptsList.addEventListener('mouseup', (e) => {
+  document.body.addEventListener('mouseup', (e) => {
     resetMove()
   });
-  scriptsList.addEventListener('mouseleave', (e) => {
+  document.body.addEventListener('mouseleave', (e) => {
     resetMove()
   });
 
-  function setMove(index){
-    if(index!=null){
-    moveFromIndex=index; 
-    moveToIndex=index;
-    }
-    if(moveToIndex!=-1){
-      document.querySelectorAll('.sra-script')[moveToIndex].style.transform='scale(105%)'
-      document.querySelectorAll('.sra-script')[moveToIndex].style.zIndex='100'
-      document.querySelectorAll('.sra-script')[moveToIndex].style.opacity='0.9'
-      document.querySelectorAll('.sra-script')[moveToIndex].style.boxShadow='0 0 0 4px white'
-    }
+function setMove(index) {
+  if (index != null) {
+    moveFromIndex = index;
+    moveToIndex = index;
   }
-  function resetMove(){
-    if(moveToIndex!=-1){
-    document.querySelectorAll('.sra-script')[moveToIndex].style.transform=''
-    document.querySelectorAll('.sra-script')[moveToIndex].style.zIndex=''
-    document.querySelectorAll('.sra-script')[moveToIndex].style.opacity=''
-    document.querySelectorAll('.sra-script')[moveToIndex].style.boxShadow=''
-    }
-    moveToIndex=-1
-    moveFromIndex=-1
+
+  if (moveToIndex != -1) {
+    document
+      .querySelectorAll('.sra-script')
+      [moveToIndex].classList.add('active-move');
+      document.querySelector('#backdrop-panel').hidden = false
+      document.querySelector('#backdrop-panel').style.cursor = 'grabbing'
   }
+
+
+
+}
+
+function resetMove() {
+  if (moveToIndex != -1) {
+    document
+      .querySelectorAll('.sra-script')
+      [moveToIndex].classList.remove('active-move');
+  }
+  moveToIndex = -1;
+  moveFromIndex = -1;
+  document.querySelector('#backdrop-panel').hidden = true
+  document.querySelector('#backdrop-panel').style.cursor = ''
+}
+
 
 
 document.addEventListener('mousemove', e => {
@@ -579,7 +576,9 @@ document.addEventListener('mousemove', e => {
   // alert(1)
   // AFTER LAST: use the bottom half of the last item
   const lastRect = s[s.length - 1].getBoundingClientRect();
-  const afterThreshold = (lastRect.top + lastRect.bottom) / 4; // midpoint
+  // const afterThreshold = (lastRect.top + lastRect.bottom) / 2; // midpoint
+  // const afterThreshold = (lastRect.top + (lastRect.bottom - lastRect.top) / 100) ; // midpoint
+  const afterThreshold = (lastRect.top) ; // midpoint
   // const afterThreshold = (lastRect.bottom); // midpoint
   if (y >= afterThreshold) {
     // s.length means "insert after last"

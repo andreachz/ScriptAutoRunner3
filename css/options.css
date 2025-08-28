@@ -226,7 +226,19 @@
   background-color: #656565;
   box-shadow: 0 0 19px 1px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
+  transition: transform 0.15s ease-in-out,
+              opacity 0.15s ease-in-out
 }
+
+
+.sra-script.active-move {
+  transform: scale(1.05);
+  z-index: 100;
+  opacity: 0.9;
+  box-shadow: 0 0 0px 4px white, 0 0 40px 2px black;
+  /* border: 4px solid white */
+}
+
 .sra-script--enable {
   color: #454851;
   background-color: #F3D32F;
@@ -333,7 +345,7 @@
   }
   .sra-script__btns {
     text-align: right;
-    width: 76px;
+    width: 85px;
   }
   .sra-script__check {
     display: none;

@@ -33,7 +33,7 @@
                 <span><i class="icon-cloud-flash"></i></span>
                 <span> Exclude hostname</span>
               </div>
-              <textarea id="excludeText" placeholder="Exclude hostnames, split by comma"></textarea>
+              <textarea id="excludeText" placeholder="Exclude hostnames, split by comma" name="exclude__text"></textarea>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@
         </div>
         
         <div class="sra-noscripts">
-          <span>No scripts yet</span>
+          <span>...</span>
         </div>
         
         <ul class="sra-scripts" id="scriptsList"></ul>
@@ -75,11 +75,11 @@
         <div class="sra-script__box">
           <div class="sra-script__content">
             <div class="sra-flex sra-flex--head">
-              <input class="sra-script__name" type="text">
+              <input class="sra-script__name" type="text" name="script__name">
               <div class="sra-script__btns">
-                <button class="sra-script__btn move-drag" style="transform: scaleX(150%);" title="Drag to move">=</button>
-                <button class="sra-script__btn move-up" title="Move up or drag and drop"><i class="icon-up-circled"></i></button>
-                <button class="sra-script__btn move-down" title="Click to Move down or drag and drop"><i class="icon-down-circled"></i></button>
+                <button class="sra-script__btn move-drag" style="transform: scaleX(180%); margin-right: 3px; cursor: grab;" title="Drag to move up or down">=</button>
+                <button class="sra-script__btn move-up" title="Move up"><i class="icon-up-circled"></i></button>
+                <button class="sra-script__btn move-down" title="Move down"><i class="icon-down-circled"></i></button>
               </div>
             </div>
             <div class="sra-flex sra-flex--content">
@@ -87,16 +87,17 @@
                 <i class="type-icon"></i>
               </div>
               <div class="sra-script__snippet">
-                <textarea class="code" placeholder="Write your own code here."></textarea>
+                <textarea class="code" placeholder="Write your own code here." name="script__snippet"></textarea>
               </div>
               <div class="sra-script__external">
-                <input class="src" type="text" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)">
+                <input class="src" type="text" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)" name="script__external">
+                <div style="height: 70px; opacity: 0;">[padding]</div>
               </div>
             </div>
             <div class="sra-flex sra-flex--foot">
               <div class="sra-flex sra-script__host-box">
                 <i class="icon-cloud-flash"></i>
-                <input class="sra-script__host host" placeholder="Target hostnames, split by comma. By default, target to all host.">
+                <input class="sra-script__host host" placeholder="Target hostnames, split by comma. By default, target to all host." name="script__host">
               </div>
               
               <button class="sra-script__btn download" title="Download script. Shift+Click: export all data"><i class="icon2-download"></i></button>
@@ -107,7 +108,7 @@
       </li>
     </template>
     
-
+    <div id="backdrop-panel" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: transparent; z-index: 1000" hidden></div>
     <script src="js/options.js"></script>
   </body>
 </html>

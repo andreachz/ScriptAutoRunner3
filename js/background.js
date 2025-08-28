@@ -32,7 +32,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // Read from chrome.storage.local
     chrome.storage.local.get([STORAGE_KEY], (res) => {
       const data = res[STORAGE_KEY] || DEFAULT_DATA;
-      console.log(res, data)
+      // console.log(res, data)
       sendResponse({ data });
     });
 
