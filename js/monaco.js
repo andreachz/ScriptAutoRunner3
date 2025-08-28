@@ -65,7 +65,7 @@ function _renderMonaco() {
     colors: {
         'editor.background': '#ffffff80',
         'editorGutter.background': '#ffffff80',
-        'minimap.background': '#ffffff40',
+        'minimap.background': '#ffffff80',
 
         // focus outline
         'focusBorder': '#00000000',          // fully remove
@@ -88,24 +88,42 @@ function _renderMonaco() {
     // const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     //   monaco.editor.setTheme(dark ? 'vs-dark' : 'vs');
 
-    // Keep textarea in sync as user types (so form validation/etc. see latest)
-    editor.onDidChangeModelContent(() => {
-        ta.value = editor.getValue();
-    });
+    // --- Sync Monaco -> textarea (and bubble events, like your CM version) ---
+    const syncEditorToTextarea = () => {
+      const val = editor.getValue();
+      if (ta.value !== val) {
+        ta.value = val;
+        ta.dispatchEvent(new Event('input',  { bubbles: true }));
+        ta.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    };
+
+    // Initial sync (in case Monaco normalizes line endings etc.)
+    syncEditorToTextarea();
+
+    // Keep textarea in sync on every edit
+    editor.onDidChangeModelContent(syncEditorToTextarea);
+
+    // --- Optional: Sync textarea -> Monaco (if you change ta.value programmatically) ---
+    const syncTextareaToEditor = () => {
+      const val = ta.value;
+      if (editor.getValue() !== val) editor.setValue(val);
+    };
+    ta.addEventListener('input',  syncTextareaToEditor);
+    ta.addEventListener('change', syncTextareaToEditor);
 
     // Ensure value is synced on submit (belt & suspenders)
     const form = ta.closest('form');
     if (form) {
-        form.addEventListener('submit', () => {
+      form.addEventListener('submit', () => {
         ta.value = editor.getValue();
-        });
+      });
     }
 
     // Resize Monaco when its container changes size
     const ro = new ResizeObserver(() => editor.layout());
     ro.observe(container);
 
-    // Keep references for cleanup
     editors.set(ta, { editor, ro, container, wrapper });
     });
 
