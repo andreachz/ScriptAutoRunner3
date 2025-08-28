@@ -17,8 +17,13 @@
   <body>
     <div class="sra-wrapper" id="app">
       <div class="sra-setting">
+        
+        
+        <span style="display: inline-block; transform: translate(-12px,-3px);"><span style="display: inline; font-size: large;">ScriptAutoRunner3</span></span>
+        
         <i class="icon-cog" id="settingsToggle"></i>
         <h4 style="display: inline; margin-left: 15px; cursor: pointer;" id="info-btn">?</h4>
+        
       </div>
 
       <div class="sra-setting__content" id="settingsPanel">
@@ -42,11 +47,14 @@
                 <span> Choose editor</span>
 
                 <!-- selector -->
-              <select id="editorSelect" style="margin-left:.5rem; padding: 4px;">
-                <option selected value="monaco">Monaco - Powerful, heavy</option>
-                <option value="codemirror">CodeMirror - Balanced</option>
-                <option value="plain">Plain text - Light, simple</option>
-              </select>
+                <select id="editorSelect" style="margin-left:.5rem; padding: 4px;">
+                  <option selected value="monaco">Monaco - Powerful</option>
+                  <option value="codemirror">CodeMirror - Balanced</option>
+                  <option value="plain">Plain text - Lightweight</option>
+                  <!-- <option selected value="monaco">Monaco - Powerful, heavy</option>
+                  <option value="codemirror">CodeMirror - Balanced</option>
+                  <option value="plain">Plain text - Light, simple</option> -->
+                </select>
               </div>
             </div>
           </div>
