@@ -840,12 +840,17 @@ function setupDragAndDrop() {
 
 function renderEditor(){
   // choose one
-
-  if(localStorage.getItem(SAR_EDITOR) == 'codemirror'){
+  let s = localStorage.getItem(SAR_EDITOR)
+  if(s == 'codemirror'){
     renderCodeMirror()
   }
-  else{
+  else if( s=='monaco'){
+    document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {ta.classList.remove('monaco')})
+    document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {ta.classList.add('monaco')})
     renderMonaco()
+  }
+  else{
+    document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {ta.classList.remove('monaco')})
   }
   
   
