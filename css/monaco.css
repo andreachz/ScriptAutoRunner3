@@ -12,10 +12,11 @@ textarea.monaco {
   /* margin: 0.5rem 0 1rem; */
 }
 .monaco-container {
-  height: 100px;          /* adjust per use-case */
+  height: 180px;          /* adjust per use-case */
   border: 1px solid rgba(0, 0, 0, 0.3); /* optional styling */
   resize: both;        /* or 'vertical' */
   overflow: auto;      /* required for resize handle to show */
   min-width: 630px;
+  width: 700px;
   /* background: transparent; */
 }

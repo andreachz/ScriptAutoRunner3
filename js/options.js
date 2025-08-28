@@ -251,9 +251,14 @@ window.addEventListener("storage", (event) => {
   }
 
   function editorSelector(){
+
+    
   // Grab the select element
     const editorSelect = document.getElementById('editorSelect');
-
+    
+    if(!localStorage.getItem(SAR_EDITOR)){
+      localStorage.setItem(SAR_EDITOR, editorSelect.value || 'monaco');
+    }
     // --- Load saved choice (default to "monaco") ---
     const saved = localStorage.getItem(SAR_EDITOR) || 'monaco'; // monaco | codemirror
     editorSelect.value = saved;
@@ -267,6 +272,11 @@ window.addEventListener("storage", (event) => {
       localStorage.setItem(SAR_EDITOR, choice);
       renderList()
     });
+    
+    // editorSelect.dispatchEvent(new Event('input',  { bubbles: true }));
+    // editorSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+
   }
   editorSelector()
 

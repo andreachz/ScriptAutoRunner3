@@ -83,6 +83,17 @@ function _renderMonaco() {
         fontSize: 12,
         // lineHeight: 18,
         theme: 'vs-custom', // 'vs' 'vs-dark' or 'hc-black' also available
+        scrollbar: {
+            // widths and heights
+            verticalScrollbarSize: 10,
+            horizontalScrollbarSize: 10,
+            arrowSize: 8,
+
+            // optional: makes scrollbar thinner when not hovered
+            // useShadows: false,
+            // verticalHasArrows: false,
+            // horizontalHasArrows: false
+        }
     });
       
     // const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
