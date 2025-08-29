@@ -33,21 +33,23 @@ The original extension relied on features no longer supported in MV3 and could n
   - Added deletion options with key combinations on delete button.  
   - UI/UX visual improvements and bugfixes.  
 
+### UI overview
+![UI overview](ss/08.png)  
+*Main interface showing some of the available features.*
 
-<figure>
-  <img src="ss/08.png" alt="Main editor interface with Monaco/CodeMirror integration">
-  <figcaption>Screenshot of the main editor interface showing syntax-highlighted code with Monaco/CodeMirror integration</figcaption>
-</figure>
+---
 
-<figure>
-  <img src="ss/options01.png" alt="Options menu with export and UI preferences">
-  <figcaption>Screenshot of the options menu, displaying new settings for exporting scripts and managing UI preferences</figcaption>
-</figure>
+### Options menu
+![Options menu box](ss/options01.png)  
+*Options menu box for settings and code editor preferences.*
 
-<figure>
-  <img src="ss/drag01.png" alt="Drag-and-drop functionality">
-  <figcaption>Screenshot demonstrating drag-and-drop functionality to reorder scripts in the interface</figcaption>
-</figure>
+---
+
+### Drag-and-drop functionality
+![Drag-and-drop functionality to reorder scripts](ss/drag01.png)  
+*Reordering scripts with drag-and-drop.*
+
+
 
 ---
 
