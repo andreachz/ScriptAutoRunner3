@@ -34,11 +34,20 @@ The original extension relied on features no longer supported in MV3 and could n
   - UI/UX visual improvements and bugfixes.  
 
 
-![UI overview](ss/08.png)
+<figure>
+  <img src="ss/08.png" alt="Main editor interface with Monaco/CodeMirror integration">
+  <figcaption>Screenshot of the main editor interface showing syntax-highlighted code with Monaco/CodeMirror integration</figcaption>
+</figure>
 
-![Options menu box](ss/options01.png)
+<figure>
+  <img src="ss/options01.png" alt="Options menu with export and UI preferences">
+  <figcaption>Screenshot of the options menu, displaying new settings for exporting scripts and managing UI preferences</figcaption>
+</figure>
 
-![Drag-and-drop functionality to reorder scripts](ss/drag01.png)
+<figure>
+  <img src="ss/drag01.png" alt="Drag-and-drop functionality">
+  <figcaption>Screenshot demonstrating drag-and-drop functionality to reorder scripts in the interface</figcaption>
+</figure>
 
 ---
 
