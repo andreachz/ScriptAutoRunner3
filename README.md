@@ -33,9 +33,12 @@ The original extension relied on features no longer supported in MV3 and could n
   - Added deletion options with key combinations on delete button.  
   - UI/UX visual improvements and bugfixes.  
 
-![](ss/08.png)
-![](ss/options01.png)
-![](ss/drag01.png)
+
+![UI overview](ss/08.png)
+
+![Options menu box](ss/options01.png)
+
+![Drag-and-drop functionality to reorder scripts](ss/drag01.png)
 
 ---
 
