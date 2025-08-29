@@ -5,6 +5,7 @@ let moveToIndex = -1;
 let oldScriptsDisposition;
 const DRAG_MOVE_V2 = true
 const SAR_EDITOR = '_SAR_EDITOR'
+let mouseDragStartingState = {x: 0, y:0}
 
 
 document.getElementById("info-btn").addEventListener("click", function () {
@@ -534,7 +535,8 @@ function genericDownload(e, index) {
     const index = parseInt(li.dataset.index, 10); if (Number.isNaN(index)) return;
 
     if (e.target.closest('.sra-script__plug'))        return;
-    else if (e.target.closest('.move-drag'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
+    else if (e.target.closest('.move-drag'))          {setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
+    else if (e.target.closest('.sra-script__type'))   {setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
     // else if (e.target.closest('.move-up'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
     // else if (e.target.closest('.move-down'))        {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  };
     // else if (e.target.closest('.remove'))           removeScript(index, e);
@@ -548,7 +550,7 @@ function genericDownload(e, index) {
     resetMove()
   });
 
-function setMove(index) {
+function setMove(index, e) {
   if (index != null) {
     moveFromIndex = index;
     moveToIndex = index;
@@ -558,8 +560,7 @@ function setMove(index) {
     document
       .querySelectorAll('.sra-script')
       [moveToIndex].classList.add(DRAG_MOVE_V2?'active-move-inplace':'active-move-v1');
-      document.querySelector('#backdrop-panel').hidden = false
-      document.querySelector('#backdrop-panel').style.cursor = 'grabbing'
+
 
       if(DRAG_MOVE_V2){
         if(!document.querySelector('#tempdrag')){
@@ -569,14 +570,12 @@ function setMove(index) {
           tempdrag.classList.add('active-move-v2')
           tempdrag.style.listStyleType='none'
           document.body.appendChild(tempdrag)
-          draggingTempdrag(null, moveFromIndex)
+          draggingTempdrag(e, moveFromIndex)
         }
       }
+        document.querySelector('#backdrop-panel').hidden = false
+        document.querySelector('#backdrop-panel').style.cursor = 'grabbing'
   }
-
-
-
-
 
 
 
@@ -600,27 +599,28 @@ function resetMove() {
 function draggingTempdrag(e, index){
     let tempdrag = document.querySelector('#tempdrag')
     
-  if(tempdrag){
-    let target = document.querySelectorAll('.sra-scripts .sra-script')[index]
+    if(e.type == 'mousedown'){
+      let target = document.querySelectorAll('.sra-scripts .sra-script')[index]
+      let liRect = target.getBoundingClientRect()
 
-    let dragBtn = target.querySelector(".move-drag")
-
-    let liRect = target.getBoundingClientRect()
-    let btnRect = dragBtn.getBoundingClientRect()
-
-    let relativeX = btnRect.left - liRect.left
-    let relativeY = btnRect.top - liRect.top
-    // move tempdrag with mouse
-    tempdrag.style.pointerEvents = 'none'; // so it doesn't block other elements
-    if(e){
-    tempdrag.style.left = (e.clientX - relativeX - 25) + 'px';
-    tempdrag.style.top = (e.clientY - relativeY - 15) + 'px';
+      mouseDragStartingState = {x: e.clientX, y: e.clientY, target_x: liRect.left, target_y: liRect.top, target_h: liRect.height, target_w: liRect.width }
     }
-    else{
-      tempdrag.style.left = (liRect.left - 15)+'px'
-      tempdrag.style.top = (liRect.top)+'px'
+
+    if(tempdrag){
+      // move tempdrag with mouse
+      tempdrag.style.pointerEvents = 'none'; // so it doesn't block other elements
+      
+      let scaleValue = 1.03
+      
+      let relativeX = (mouseDragStartingState.x - mouseDragStartingState.target_x) 
+      let relativeY = (mouseDragStartingState.y - mouseDragStartingState.target_y)
+
+      tempdrag.style.transformOrigin = `${relativeX}px ${relativeY}px`
+
+      tempdrag.style.left = (e.clientX - relativeX) + 'px';
+      tempdrag.style.top = (e.clientY - relativeY - 10) + 'px';
+      
     }
-  }
 }
 
 document.addEventListener('mousemove', e => {

@@ -33,7 +33,8 @@ The original extension relied on features no longer supported in MV3 and could n
   - Added deletion options with key combinations on delete button.  
   - UI/UX visual improvements and bugfixes.  
 
-![](ss/07.png)
+![](ss/08.png)
+![](ss/09.png)
 
 ---
 

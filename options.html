@@ -50,7 +50,7 @@
                 <select id="editorSelect" style="margin-left:.5rem; padding: 4px;">
                   <option selected value="monaco">Monaco - Powerful</option>
                   <option value="codemirror">CodeMirror - Balanced</option>
-                  <option value="plain">Plain text - Lightweight</option>
+                  <option value="plain">Plain text - Basic</option>
                   <!-- <option selected value="monaco">Monaco - Powerful, heavy</option>
                   <option value="codemirror">CodeMirror - Balanced</option>
                   <option value="plain">Plain text - Light, simple</option> -->
@@ -113,7 +113,7 @@
               </div>
               <div class="sra-script__external">
                 <input class="src" type="text" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)" name="script__external">
-                <div style="height: 70px; opacity: 0;">[padding]</div>
+                <div style="height: 150px; opacity: 1;overflow: hidden; resize: both; min-width: 730px;"></div>
               </div>
             </div>
             <div class="sra-flex sra-flex--foot">
@@ -130,7 +130,7 @@
       </li>
     </template>
     
-    <div id="backdrop-panel" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: transparent; z-index: 1000" hidden></div>
+    <div id="backdrop-panel" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: transparent; z-index: 1000;" hidden></div>
     <script src="js/monaco-editor/min/vs/loader.js"></script>
     <script src="js/monaco.js"></script>
     

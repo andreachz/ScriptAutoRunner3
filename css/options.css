@@ -4,7 +4,8 @@
 }
 .sra-setting {
   position: fixed;
-  top: 20px;
+  /* top: 20px; */
+  top: 14px;
   right: 20px;
   font-size: 26px;
   text-align: right;
@@ -253,6 +254,7 @@
   top: 0;
   right: 0;
   transform: scale(1.03);
+  /* transform-origin: top left; */
   z-index: 100;
   opacity: 0.9;
   box-shadow: 0 0 0px 4px white, 0 0 40px 2px black;
@@ -391,6 +393,7 @@
     margin-right: 10px;
     width: 20px;
     text-align: center;
+    cursor: grab;
   }
   
   .sra-script__radio:checked + .sra-script__type {
@@ -430,6 +433,7 @@
     width: 100%;
     box-sizing: border-box;
     min-height: 100px;
+    height: 180px;
     border-radius: 1px;
     background-color: transparent;
     color: inherit;
