@@ -34,7 +34,8 @@ The original extension relied on features no longer supported in MV3 and could n
   - UI/UX visual improvements and bugfixes.  
 
 ![](ss/08.png)
-![](ss/09.png)
+![](ss/options01.png)
+![](ss/drag01.png)
 
 ---
 
