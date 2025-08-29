@@ -28,7 +28,8 @@ The original extension relied on features no longer supported in MV3 and could n
 - **New features for improved UI and usability**  
   - Added Monaco and CodeMirror support for colored code syntax highlighting and coding tools.  
   - Added drag-and-drop support for easy import of .js files.  
-  - Added button for script dowload or full data export.  
+  - Added maximize/minimze button for script editor.  
+  - Added button for script download or full data export.  
   - Added drag-and-drop support for moving and rearranging scripts.
   - Added deletion options with key combinations on delete button.  
   - UI/UX visual improvements and bugfixes.
@@ -59,6 +60,15 @@ Huge thanks to [**nakajmg**](https://github.com/nakajmg) for creating the origin
 This project simply adapts that excellent work for Manifest V3 while keeping the same spirit of simplicity and functionality alive. Some new extra features are introduced as well.
 
 ---
+
+### `history` directory content
+This folder keeps some archived snapshots of the project at key stages:
+
+- **`ScriptAutoRunner-master.zip`**  
+  Original fork (last commit preserved).
+
+- **`ScriptAutoRunner-master__to_vanilla_js.zip`**  
+  Minimum changes to original fork required for Vue to vanilla JS migration and Manifest V3 compliance.
 
 ## Keeping the same good old features from the original repo
 

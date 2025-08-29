@@ -11,6 +11,9 @@
   min-width: 630px;
 }
 
+.CodeMirror-empty { color: #888; font-style: initial; }
+
+
 /* PADDING */
 
 .CodeMirror-lines {

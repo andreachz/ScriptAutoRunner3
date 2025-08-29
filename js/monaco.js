@@ -83,6 +83,7 @@ function _renderMonaco() {
         fontSize: 12,
         // lineHeight: 18,
         theme: 'vs-custom', // 'vs' 'vs-dark' or 'hc-black' also available
+        placeholder: "Start typing your code here...",
         scrollbar: {
             // widths and heights
             verticalScrollbarSize: 10,

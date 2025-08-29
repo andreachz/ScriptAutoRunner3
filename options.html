@@ -10,13 +10,15 @@
     <link rel="stylesheet" href="css/monaco.css" media="screen" charset="utf-8">
 
     <link rel="stylesheet" href="css/codemirror.css">
-    <script src="js/codemirror/lib/codemirror.js"></script>
-    <script src="js/codemirror/mode/javascript/javascript.js"></script>
+    <script src="js/codemirror-5.65.16/lib/codemirror.min.js"></script>
+    <script src="js/codemirror-5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="js/codemirror-5.65.16/addon/display/placeholder.min.js"></script>
+
 
   </head>
   <body>
     <div class="sra-wrapper" id="app">
-      <div class="sra-setting">
+      <div class="sra-setting" style="z-index: 0;">
         
         
         <span style="display: inline-block; transform: translate(-12px,-3px);"><span style="display: inline; font-size: large;">ScriptAutoRunner3</span></span>
@@ -100,6 +102,7 @@
               <input class="sra-script__name" type="text" name="script__name">
               <div class="sra-script__btns">
                 <button class="sra-script__btn move-drag" style="transform: scaleX(180%); margin-right: 3px; cursor: grab;" title="Drag to move up or down">=</button>
+                <button class="sra-script__btn max-min" style="margin-right: 3px; cursor: pointer;" title="Maximize/Minimize"><div style="border: 2px solid; border-radius: 2px; width: 8px; height: 8px; transform: translateX(2px);"></div></button>
                 <button class="sra-script__btn move-up" title="Move up"><i class="icon-up-circled"></i></button>
                 <button class="sra-script__btn move-down" title="Move down"><i class="icon-down-circled"></i></button>
               </div>
@@ -113,7 +116,7 @@
               </div>
               <div class="sra-script__external">
                 <input class="src" type="text" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)" name="script__external">
-                <div style="height: 150px; opacity: 1;overflow: hidden; resize: both; min-width: 730px;"></div>
+                <div class="padding-external" style="height: 150px; opacity: 1;overflow: hidden; resize: both; min-width: 730px;"></div>
               </div>
             </div>
             <div class="sra-flex sra-flex--foot">

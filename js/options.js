@@ -6,6 +6,7 @@ let oldScriptsDisposition;
 const DRAG_MOVE_V2 = true
 const SAR_EDITOR = '_SAR_EDITOR'
 let mouseDragStartingState = {x: 0, y:0}
+let tout0
 
 
 document.getElementById("info-btn").addEventListener("click", function () {
@@ -394,8 +395,52 @@ function genericDownload(e, index) {
     URL.revokeObjectURL(url); // clean up
   } else {
     downloadScript(index);
+  }4
+}
+
+
+function maxMinScriptBox(e, index) {
+  const el = document.querySelectorAll('.sra-scripts .sra-script')[index]
+  if(state.scripts[index].type == 'external'){return}
+  const textbox = el.querySelector('.monaco-container') || el.querySelector('.CodeMirror') || el.querySelector('.code');
+
+  // Make sure we can track state on the element
+  if (!el.dataset.boxstate) {
+    el.dataset.boxstate = "minimized";
+  }
+
+  if (el.dataset.boxstate !== "maximized") {
+    // Scroll the page so the element is at the top
+    const rect = el.getBoundingClientRect();
+    const scrollTop = window.scrollY + rect.top;
+    
+
+    // Resize element to viewport dimensions
+    // el.style.position = "fixed";
+    // el.style.top = "0px";
+    // el.style.left = "0px";
+    textbox.style.width = (window.innerWidth - 220) + "px";
+    textbox.style.height = (window.innerHeight - 90) + "px";
+    // el.style.zIndex = "9999";
+
+    window.scrollTo({ top: scrollTop, behavior: "auto" });
+
+
+    el.dataset.boxstate = "maximized";
+  } else {
+    // Reset styles back to default
+    // el.style.position = "";
+    // el.style.top = "";
+    // el.style.left = "";
+    textbox.style.width = "";
+    textbox.style.height = "";
+    // el.style.zIndex = "";
+
+    el.dataset.boxstate = "minimized";
   }
 }
+
+
 
 
   async function downloadScript(index) {
@@ -528,15 +573,21 @@ function genericDownload(e, index) {
     else if (e.target.closest('.move-down'))        moveDown(index);
     else if (e.target.closest('.remove'))           removeScript(index, e);
     else if (e.target.closest('.download'))         genericDownload(e, index);
+    else if (e.target.closest('.max-min'))          maxMinScriptBox(e, index);
   });
   
   scriptsList.addEventListener('mousedown', (e) => {
     const li = e.target.closest('li.sra-script'); if (!li) return;
     const index = parseInt(li.dataset.index, 10); if (Number.isNaN(index)) return;
 
-    if (e.target.closest('.sra-script__plug'))        return;
-    else if (e.target.closest('.move-drag'))          {setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
+
+    if (e.target.closest('.move-drag'))          {setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
     else if (e.target.closest('.sra-script__type'))   {setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
+    if (e.target.closest('.sra-script__plug') || e.target.closest('.sra-script__btns')) {
+      tout0 = setTimeout(()=>{
+        setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  
+      }, 220)
+    }
     // else if (e.target.closest('.move-up'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
     // else if (e.target.closest('.move-down'))        {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  };
     // else if (e.target.closest('.remove'))           removeScript(index, e);
@@ -551,6 +602,7 @@ function genericDownload(e, index) {
   });
 
 function setMove(index, e) {
+  document.body.classList.add('no-select')
   if (index != null) {
     moveFromIndex = index;
     moveToIndex = index;
@@ -565,11 +617,17 @@ function setMove(index, e) {
       if(DRAG_MOVE_V2){
         if(!document.querySelector('#tempdrag')){
           let tempdrag = document.querySelectorAll('.sra-script')[moveFromIndex].cloneNode(true)
+          
           tempdrag.id = 'tempdrag'
+          // tempdrag.classList.add('active-move-v2')
           tempdrag.classList.remove('active-move-inplace')
-          tempdrag.classList.add('active-move-v2')
+          // setTimeout(()=>{tempdrag.classList.add('active-move-v2')},0)
+
           tempdrag.style.listStyleType='none'
           document.body.appendChild(tempdrag)
+          requestAnimationFrame(() => {
+            tempdrag.classList.add('active-move-v2'); // apply the target state next frame
+          });
           draggingTempdrag(e, moveFromIndex)
         }
       }
@@ -582,6 +640,8 @@ function setMove(index, e) {
 }
 
 function resetMove() {
+  clearTimeout(tout0)
+  document.body.classList.remove('no-select')
   if (moveToIndex != -1) {
     document
       .querySelectorAll('.sra-script')
@@ -879,7 +939,8 @@ function renderCodeMirror() {
     const editor = CodeMirror.fromTextArea(ta, {
       mode: 'javascript',
       lineNumbers: true,
-      theme: 'default'
+      theme: 'default',
+      placeholder: "Start typing your code here..."
     });
 
     // Keep textarea.value in sync with CodeMirror on every edit
