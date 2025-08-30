@@ -1,13 +1,18 @@
 const _POPUP_STORAGE_CHANGE_KEY = 'POPUP_STORAGE_CHANGE_KEY'
 const SAR_PREFIX = '__SAR_DATA::';
+const SAR_EDITOR = '_SAR_EDITOR'
+
+// script boxes move and dragging
 let moveFromIndex = -1;
 let moveToIndex = -1;
 let oldScriptsDisposition;
 const DRAG_MOVE_V2 = true
-const SAR_EDITOR = '_SAR_EDITOR'
 let mouseDragStartingState = {x: 0, y:0}
 let tout0
+//
 
+// max/min boxes
+let initialYScrollState
 
 document.getElementById("info-btn").addEventListener("click", function () {
   alert("ScriptAutoRunner3 \n\nThis fork (26 Aug, 2025):\nhttps://github.com/andreachz/ScriptAutoRunner3\n\nOriginal fork (Sep 16, 2015 - Jan 11, 2025):\nhttps://github.com/nakajmg/ScriptAutoRunner");
@@ -400,8 +405,10 @@ function genericDownload(e, index) {
 
 
 function maxMinScriptBox(e, index) {
+  const behave = 'auto'
   const el = document.querySelectorAll('.sra-scripts .sra-script')[index]
   if(state.scripts[index].type == 'external'){return}
+  
   const textbox = el.querySelector('.monaco-container') || el.querySelector('.CodeMirror') || el.querySelector('.code');
 
   // Make sure we can track state on the element
@@ -410,6 +417,7 @@ function maxMinScriptBox(e, index) {
   }
 
   if (el.dataset.boxstate !== "maximized") {
+    initialYScrollState = window.scrollY || document.documentElement.scrollTop;
     // Scroll the page so the element is at the top
     const rect = el.getBoundingClientRect();
     const scrollTop = window.scrollY + rect.top;
@@ -423,11 +431,14 @@ function maxMinScriptBox(e, index) {
     textbox.style.height = (window.innerHeight - 90) + "px";
     // el.style.zIndex = "9999";
 
-    window.scrollTo({ top: scrollTop, behavior: "auto" });
+    window.scrollTo({ top: scrollTop, behavior: behave });
+
+    el.querySelector('.monaco-container').style.overflow = 'visible'
 
 
     el.dataset.boxstate = "maximized";
   } else {
+    window.scrollTo({ top: initialYScrollState, behavior: behave });
     // Reset styles back to default
     // el.style.position = "";
     // el.style.top = "";
@@ -435,7 +446,7 @@ function maxMinScriptBox(e, index) {
     textbox.style.width = "";
     textbox.style.height = "";
     // el.style.zIndex = "";
-
+    el.querySelector('.monaco-container').style.overflow = ''
     el.dataset.boxstate = "minimized";
   }
 }

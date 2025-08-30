@@ -263,6 +263,22 @@
   /* box-shadow: 0 0 40px 2px black; */
 }
 
+.max-min-icon{
+    border: 2px solid;
+    border-radius: 2px;
+    width: 8px;
+    height: 8px;
+    transform: translateX(2px);
+}
+.max-min-icon2{
+    border: 2px solid;
+    border-radius: 2px;
+    width: 13px;
+    height: 9px;
+    transform: translate(2px, 2px) scale(83%);
+    border-top: 5px double;
+}
+
 .sra-script--enable {
   color: #454851;
   background-color: #F3D32F;
@@ -369,7 +385,7 @@
   }
   .sra-script__btns {
     text-align: right;
-    width: 115px;
+    width: 116px;
   }
   .sra-script__check {
     display: none;
