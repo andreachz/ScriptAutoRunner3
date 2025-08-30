@@ -35,7 +35,7 @@ The original extension relied on features no longer supported in MV3 and could n
   - UI/UX visual improvements and bugfixes.
 
 ### UI overview
-![UI overview](ss/08.png)  
+![UI overview](ss/09.png)  
 *Main interface showing some of the available features.*
 
 ---
@@ -47,7 +47,7 @@ The original extension relied on features no longer supported in MV3 and could n
 ---
 
 ### Drag-and-drop functionality
-![Drag-and-drop functionality to reorder scripts](ss/drag01.png)  
+![Drag-and-drop functionality to reorder scripts](ss/drag02.png)  
 *Reordering scripts with drag-and-drop.*
 
 

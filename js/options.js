@@ -953,7 +953,7 @@ function renderCodeMirror() {
       mode: 'javascript',
       lineNumbers: true,
       theme: 'default',
-      placeholder: "Start typing your code here..."
+      placeholder: "Type your code or drop a script file here..."
     });
 
     // Keep textarea.value in sync with CodeMirror on every edit
