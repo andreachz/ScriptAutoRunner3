@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ScriptAutoRunner3",
-  "description": "Injects any script into a website. It can autorun as well.",
+  "description": "Create and autorun custom scripts on any website. Works with Manifest V3.",
   "version": "0.1.0",
   "background": {
     "service_worker": "js/background.js"

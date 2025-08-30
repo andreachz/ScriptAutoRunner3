@@ -433,6 +433,7 @@ function maxMinScriptBox(e, index) {
 
     window.scrollTo({ top: scrollTop, behavior: behave });
 
+    if(el.querySelector('.monaco-container'))
     el.querySelector('.monaco-container').style.overflow = 'visible'
 
 
@@ -446,7 +447,8 @@ function maxMinScriptBox(e, index) {
     textbox.style.width = "";
     textbox.style.height = "";
     // el.style.zIndex = "";
-    el.querySelector('.monaco-container').style.overflow = ''
+    if(el.querySelector('.monaco-container'))
+    el.querySelector('.monaco-container').style.overflow = 'visible'
     el.dataset.boxstate = "minimized";
   }
 }
@@ -594,7 +596,7 @@ function maxMinScriptBox(e, index) {
 
     if (e.target.closest('.move-drag'))          {setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
     else if (e.target.closest('.sra-script__type'))   {setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
-    if (e.target.closest('.sra-script__plug') || e.target.closest('.sra-script__btns')) {
+    else if (e.target.closest('.sra-script__plug') || e.target.closest('.sra-script__btns')) {
       tout0 = setTimeout(()=>{
         setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  
       }, 220)
