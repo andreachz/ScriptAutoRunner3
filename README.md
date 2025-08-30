@@ -51,7 +51,6 @@ The original extension relied on features no longer supported in MV3 and could n
 *Reordering scripts with drag-and-drop.*
 
 
-
 ---
 
 ## Acknowledgments
