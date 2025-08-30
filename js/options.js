@@ -199,7 +199,10 @@ document.getElementById("info-btn").addEventListener("click", function () {
     document.querySelector('.sra-noscripts').children[0].innerText=totalScripts+activeScripts
   }
 
-  function renderList() {
+
+
+
+  function renderList_legacy() {
     
     scriptsList.innerHTML = '';
     state.scripts.forEach((script, index) => {
@@ -252,6 +255,86 @@ document.getElementById("info-btn").addEventListener("click", function () {
 
 
   }
+
+
+  // --- 1) Single-item factory used by BOTH renderList and addScript__no_rerender
+function createScriptListItem(script, index) {
+  const li = tpl.content.firstElementChild.cloneNode(true);
+  li.dataset.index = String(index);
+
+  li.classList.toggle('sra-script--enable', !!script.enable);
+
+  const nameInput = li.querySelector('.sra-script__name');
+  if (nameInput) {
+    nameInput.value = script.name || '';
+    nameInput.title = `#${index} (${script.type}) "${script.name}"`;
+  }
+
+  const typeIcon   = li.querySelector('.type-icon');
+  const snippetBox = li.querySelector('.sra-script__snippet');
+  const externalBox= li.querySelector('.sra-script__external');
+
+  if (typeIcon) {
+    typeIcon.className = 'type-icon ' + (script.type === 'external' ? 'icon-link' : 'icon-code');
+  }
+  if (snippetBox)  snippetBox.style.display  = (script.type === 'snippet') ? '' : 'none';
+  if (externalBox) externalBox.style.display = (script.type === 'external') ? '' : 'none';
+
+  if(script.type == 'external'){
+    li.querySelector('.max-min-btn').classList.add('disabled-item')
+  }
+
+  const codeArea = li.querySelector('.code');
+  const srcInput = li.querySelector('.src');
+  const hostInput= li.querySelector('.host');
+  if (codeArea)  codeArea.value  = script.code || '';
+  if (srcInput)  srcInput.value  = script.src  || '';
+  if (hostInput) hostInput.value = script.host || '';
+
+  // per-index UI state (first/last)
+  const upBtn = li.querySelector('.move-up');
+  const dnBtn = li.querySelector('.move-down');
+  if (upBtn) upBtn.classList.toggle('disabled-item', index === 0);
+  if (dnBtn) dnBtn.classList.toggle('disabled-item', index === state.scripts.length - 1);
+
+  return li;
+}
+
+// --- 2) Small helper to reindex DOM after an insertion
+function reindexListItems() {
+  const items = scriptsList.querySelectorAll('li');
+  items.forEach((el, i) => {
+    el.dataset.index = String(i);
+
+    const upBtn = el.querySelector('.move-up');
+    const dnBtn = el.querySelector('.move-down');
+    if (upBtn) upBtn.classList.toggle('disabled-item', i === 0);
+    if (dnBtn) dnBtn.classList.toggle('disabled-item', i === items.length - 1);
+
+    const nameEl = el.querySelector('.sra-script__name');
+    const si = state.scripts[i];
+    if (nameEl && si) {
+      nameEl.title = `#${i} (${si.type}) "${si.name}"`;
+    }
+  });
+}
+
+// --- 3) Use the factory in renderList (unchanged behavior)
+function renderList() {
+  scriptsList.innerHTML = '';
+  state.scripts.forEach((script, index) => {
+    const li = createScriptListItem(script, index);
+    scriptsList.appendChild(li);
+  });
+
+  renderScriptsCounterIndicator();
+  renderEditor();      // global mode
+  setMove(null);
+  setBtnsTooltips();   // global mode
+}
+
+
+
 
   function editorSelector(){
 
@@ -306,7 +389,7 @@ document.getElementById("info-btn").addEventListener("click", function () {
     save();
   }
 
-  function addScript(type) {
+  function addScript__full_rerender(type) {
     const s = clone(DEFAULT_SCRIPT);
     s.id = getAvailableId();
     s.type = type;
@@ -316,7 +399,43 @@ document.getElementById("info-btn").addEventListener("click", function () {
     save();
   }
 
-  function removeScript(index, e) {
+// Reuse the same factory
+function addScript__no_rerender(type, atIndex, custom_s) {
+  // 1) build the new script object
+  const s = custom_s || clone(DEFAULT_SCRIPT);
+  s.id = getAvailableId();
+  s.type = type;
+  s.name = `${s.name}${s.id}`;
+
+  // 2) normalize index (default append)
+  const n = state.scripts.length;
+  let index = (atIndex === undefined || atIndex === null || isNaN(atIndex))
+    ? n
+    : Math.max(0, Math.min(Number(atIndex), n));
+
+  // 3) update state
+  state.scripts.splice(index, 0, s);
+
+  // 4) create li using the shared builder and insert at position
+  const li = createScriptListItem(s, index);
+  const refNode = scriptsList.children[index] || null;
+  scriptsList.insertBefore(li, refNode);
+
+  // 5) fix indices/titles/first-last buttons after the insertion
+  reindexListItems();
+
+  // 6) per-item enhancements just for the new element
+  renderScriptsCounterIndicator();
+  if (typeof renderEditorEl === 'function') renderEditorEl(index);
+  if (typeof setBtnsTooltipsEl === 'function') setBtnsTooltipsEl(index);
+
+  // 7) persist
+  save();
+}
+
+  const addScript = addScript__no_rerender
+
+  function removeScript__full_rerender(index, e) {
     let isShiftDown=e.shiftKey
     let isCrtlDown=e.ctrlKey
     if (index < 0 || index >= state.scripts.length) return;
@@ -341,6 +460,83 @@ document.getElementById("info-btn").addEventListener("click", function () {
       save();
     }
   }
+
+  function removeScript__no_rerender(index, e) {
+  const isShiftDown = e.shiftKey;
+  const isCtrlDown  = e.ctrlKey;
+
+  if (index < 0 || index >= state.scripts.length) return;
+
+  // Ctrl+Shift → delete ALL
+  if (isShiftDown && isCtrlDown) {
+    if (window.confirm('Are you sure you want to delete all?')) {
+      state.scripts = [];
+      // wipe DOM list without calling renderList()
+      scriptsList.innerHTML = '';
+      renderScriptsCounterIndicator();
+      setMove(null);
+      setBtnsTooltips(); // no-ops if nothing there
+      save();
+    }
+    return;
+  }
+
+  const s = state.scripts[index];
+
+  // Delete without confirm if Shift held OR item is empty
+  const isEmpty = (!s.code?.length && !s.src?.length && !s.host?.length);
+  if (isShiftDown || isEmpty) {
+    doRemoveOne(index);
+    return;
+  }
+
+  if (window.confirm('Are you sure you want to delete?')) {
+    doRemoveOne(index);
+  }
+
+  function doRemoveOne(idx) {
+    // 1) remove from state
+    state.scripts.splice(idx, 1);
+
+    // 2) remove corresponding <li> from DOM
+    const li = scriptsList.querySelector(`li[data-index="${idx}"]`);
+    if (li && li.parentNode) li.parentNode.removeChild(li);
+
+    // 3) reindex subsequent items and refresh per-row UI bits
+    const items = scriptsList.querySelectorAll('li[data-index]');
+    items.forEach((row, i) => {
+      // update dataset index
+      row.dataset.index = String(i);
+
+      // update title tooltip reflecting new index and type/name
+      const nameInput = row.querySelector('.sra-script__name');
+      const script = state.scripts[i];
+      if (nameInput && script) {
+        nameInput.title = `#${i} (${script.type}) "${script.name || ''}"`;
+      }
+
+      // move-up / move-down disabled states
+      const upBtn = row.querySelector('.move-up');
+      const downBtn = row.querySelector('.move-down');
+      if (upBtn)   upBtn.classList.toggle('disabled-item', i === 0);
+      if (downBtn) downBtn.classList.toggle('disabled-item', i === state.scripts.length - 1);
+    });
+
+    // 4) update counters / misc UI; avoid full re-render
+    renderScriptsCounterIndicator();
+    setMove(null);
+
+    // if your tooltip setter supports per-index, call with per-row;
+    // otherwise calling once is fine (it only sets title attributes).
+    setBtnsTooltips();
+
+    // 5) persist
+    save();
+  }
+}
+
+
+  const removeScript = removeScript__no_rerender
 
   function sanitizeFilename(name, fallback = 'script') {
     const s = (name || fallback).toString().trim() || fallback;
@@ -370,6 +566,7 @@ document.getElementById("info-btn").addEventListener("click", function () {
 
 function genericDownload(e, index) {
   if (e.shiftKey) {
+    if(!confirm('Export all data to file?')){return}
     const sarLocal = lstore.get(STORAGE_KEY);
     
     if (!sarLocal) return; // no content to save
@@ -437,8 +634,10 @@ function maxMinScriptBox(e, index) {
     textbox.style.height = 'calc( 100vh - 90px )';
     
     // el.style.zIndex = "9999";
-
-    window.scrollTo({ top: scrollTop, behavior: behave });
+    setTimeout(()=>{
+      window.scrollTo({ top: scrollTop, behavior: behave });
+    }, 0)
+    
 
     if(el.querySelector('.monaco-container'))
     el.querySelector('.monaco-container').style.overflow = 'visible'
@@ -528,8 +727,8 @@ function maxMinScriptBox(e, index) {
     }
   }
 
-
-  function moveTo(fromIndex, toIndex) {
+  // simple but inefficient
+  function moveTo__full_rerender(fromIndex, toIndex) {
     if (
       fromIndex < 0 || fromIndex >= state.scripts.length ||
       toIndex   < 0 || toIndex   >= state.scripts.length
@@ -542,17 +741,82 @@ function maxMinScriptBox(e, index) {
     save();
   }
 
-  function moveUp(index) {
+  // more efficient
+  function moveTo__no_rerender(fromIndex, toIndex) {
+    const n = state.scripts.length;
+    if (fromIndex === toIndex) return;
+    if (fromIndex < 0 || fromIndex >= n || toIndex < 0 || toIndex >= n) return;
+
+    // 1) Update state
+    const [moved] = state.scripts.splice(fromIndex, 1);
+    state.scripts.splice(toIndex, 0, moved);
+
+    // 2) Reorder DOM nodes in-place
+    const fromEl = scriptsList.querySelector(`li[data-index="${fromIndex}"]`);
+    const toEl   = scriptsList.querySelector(`li[data-index="${toIndex}"]`);
+    if (!fromEl || !toEl) { save(); return; }
+
+    // Move the existing node without recreating it
+    if (fromIndex < toIndex) {
+      // insert after `toEl`
+      scriptsList.insertBefore(fromEl, toEl.nextSibling);
+    } else {
+      // insert before `toEl`
+      scriptsList.insertBefore(fromEl, toEl);
+    }
+
+    // 3) Recompute data-index and per-index UI bits for all items
+    const items = scriptsList.querySelectorAll('li');
+    items.forEach((li, i) => {
+      li.dataset.index = String(i);
+
+      // first/last move buttons state
+      const upBtn = li.querySelector('.move-up');
+      const dnBtn = li.querySelector('.move-down');
+      if (upBtn) upBtn.classList.toggle('disabled-item', i === 0);
+      if (dnBtn) dnBtn.classList.toggle('disabled-item', i === items.length - 1);
+
+      // update title to reflect new index (preserves type/name from inputs)
+      const nameInput = li.querySelector('.sra-script__name');
+      if (nameInput) {
+        const s = state.scripts[i];
+        nameInput.title = `#${i} (${s.type}) "${s.name}"`;
+      }
+    });
+
+    // 4) Any per-item tooltips/editors that depend on index are still attached to the same DOM nodes.
+    //    If your tooltip/editor logic *reads* data-index later, it's already updated above.
+    setBtnsTooltips()
+    save();
+  }
+
+  const moveTo = moveTo__no_rerender
+
+
+  function moveUp__full_rerender(index) {
     if (index - 1 < 0) return;
     [state.scripts[index - 1], state.scripts[index]] = [state.scripts[index], state.scripts[index - 1]];
     renderList(); save();
   }
 
-  function moveDown(index) {
+  function moveDown__full_rerender(index) {
     if (index + 1 >= state.scripts.length) return;
     [state.scripts[index + 1], state.scripts[index]] = [state.scripts[index], state.scripts[index + 1]];
     renderList(); save();
   }
+
+  function moveUp__no_rerender(index) {
+    if (index <= 0) return;
+    moveTo(index, index - 1); // moveTo already updates state + DOM + calls save()
+  }
+
+  function moveDown__no_rerender(index) {
+    if (index + 1 >= state.scripts.length) return;
+    moveTo(index, index + 1); // moveTo already updates state + DOM + calls save()
+  }
+
+  const moveUp = moveUp__no_rerender
+  const moveDown = moveDown__no_rerender
 
   function togglePowerPerScript(index) {
     const s = state.scripts[index]; if (!s) return;
@@ -593,7 +857,7 @@ function maxMinScriptBox(e, index) {
     else if (e.target.closest('.move-down'))        moveDown(index);
     else if (e.target.closest('.remove'))           removeScript(index, e);
     else if (e.target.closest('.download'))         genericDownload(e, index);
-    else if (e.target.closest('.max-min'))          maxMinScriptBox(e, index);
+    else if (e.target.closest('.max-min-btn'))          maxMinScriptBox(e, index);
   });
   
   scriptsList.addEventListener('mousedown', (e) => {
@@ -602,10 +866,11 @@ function maxMinScriptBox(e, index) {
 
     if(e.target.closest('li.sra-script')){
       let el = document.querySelectorAll('.sra-scripts .sra-script')[index]
-      if(el.dataset.boxstate=='maximized'){
+      
+      if(el && el.dataset.boxstate=='maximized'){
         const rect = el.getBoundingClientRect();
         const scrollTop = window.scrollY + rect.top;
-        window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+        window.scrollTo({ top: scrollTop, behavior: 'auto' });
       }
     }
 
@@ -822,8 +1087,15 @@ async function addSnippetWithContent(name, content) {
   s.enable = false;
   s.name = name || `Script${s.id}`;
   s.code = content || '';
+  
+  // full rerender
   state.scripts.push(s);
   renderList();
+
+  // no rerender
+  // addScript__no_rerender(s.type, undefined, s)
+
+
   await save();
   return state.scripts.length - 1;
 }
@@ -942,6 +1214,15 @@ function setupDragAndDrop() {
 }
 
   })();
+
+
+  window.state = state
+  window.tpl = tpl
+  window.renderScriptsCounterIndicator = renderScriptsCounterIndicator
+  window.setMove = setMove
+  window.setBtnsTooltips  = setBtnsTooltips 
+  window.save  = save
+
 })();
 
 function renderEditor(){
@@ -961,6 +1242,7 @@ function renderEditor(){
   
   
 }
+
 function renderCodeMirror() {
   const editors = [];
 
@@ -1009,5 +1291,87 @@ function renderCodeMirror() {
   // (Optional) return helpers if you need them elsewhere
   return { editors, getAllCode };
 }
+
+// Keep CM instances associated to their original <textarea>
+const __cmMap = new WeakMap();
+
+function renderCodeMirrorEl(index) {
+  const setupFor = (ta, idx) => {
+    // Avoid double init
+    if (__cmMap.has(ta)) return __cmMap.get(ta);
+
+    const editor = CodeMirror.fromTextArea(ta, {
+      mode: 'javascript',
+      lineNumbers: true,
+      theme: 'default',
+      placeholder: "Type your code or drop a script file here..."
+    });
+
+    // Keep textarea.value in sync with CodeMirror on every edit
+    const syncEditorToTextarea = () => {
+      const val = editor.getValue();
+      if (ta.value !== val) {
+        ta.value = val;
+        ta.dispatchEvent(new Event('input',  { bubbles: true }));
+        ta.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    };
+
+    // Initial sync
+    syncEditorToTextarea();
+
+    // Sync on every change in CodeMirror
+    editor.on('change', syncEditorToTextarea);
+
+    // Keep CodeMirror in sync if textarea is edited programmatically
+    const syncTextareaToEditor = () => {
+      const val = ta.value;
+      if (editor.getValue() !== val) editor.setValue(val);
+    };
+    ta.addEventListener('input',  syncTextareaToEditor);
+    ta.addEventListener('change', syncTextareaToEditor);
+
+    __cmMap.set(ta, editor);
+    return editor;
+  };
+
+  // If an index is provided, init only that item
+  if (index !== undefined && index !== null) {
+    const li = scriptsList.querySelector(`li[data-index="${index}"]`);
+    if (!li) return null;
+    const ta = li.querySelector('textarea.code');
+    if (!ta) return null;
+    return setupFor(ta, index);
+  }
+
+  // Otherwise, initialize all (legacy behavior)
+  const editors = [];
+  document.querySelectorAll('.sra-scripts textarea.code').forEach((ta, i) => {
+    editors.push(setupFor(ta, i));
+  });
+
+  // helpers
+  const getAllCode = () => editors.map((ed) => ed.getValue());
+  return { editors, getAllCode };
+}
+
+// Optional utilities if you need them elsewhere:
+function getCodeMirrorForIndex(index) {
+  const li = scriptsList.querySelector(`li[data-index="${index}"]`);
+  if (!li) return null;
+  const ta = li.querySelector('textarea.code');
+  return ta ? __cmMap.get(ta) || null : null;
+}
+
+function getAllCodeMirrorEditors() {
+  // WeakMap isn't iterable; re-scan DOM to collect known instances.
+  const out = [];
+  document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {
+    const ed = __cmMap.get(ta);
+    if (ed) out.push(ed);
+  });
+  return out;
+}
+
 
 

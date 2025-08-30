@@ -102,7 +102,7 @@
               <input class="sra-script__name" type="text" name="script__name">
               <div class="sra-script__btns">
                 <button class="sra-script__btn move-drag" style="transform: scaleX(180%); margin-right: 3px; cursor: grab;" title="Drag to move up or down">=</button>
-                <button class="sra-script__btn max-min" style="margin-right: 3px; cursor: pointer;" title="Maximize/Minimize"><div class="max-min-icon"></div></button>
+                <button class="sra-script__btn max-min-btn" style="margin-right: 3px; cursor: pointer;" title="Maximize/Minimize"><div class="max-min-icon"></div></button>
                 <button class="sra-script__btn move-up" title="Move up"><i class="icon-up-circled"></i></button>
                 <button class="sra-script__btn move-down" title="Move down"><i class="icon-down-circled"></i></button>
               </div>
@@ -112,7 +112,7 @@
                 <i class="type-icon"></i>
               </div>
               <div class="sra-script__snippet">
-                <textarea class="code monaco" placeholder="Write your own code here." name="script__snippet"></textarea>
+                <textarea class="code monaco no-page-scroll" placeholder="Write your own code here." name="script__snippet"></textarea>
               </div>
               <div class="sra-script__external">
                 <input class="src" type="text" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)" name="script__external">
@@ -139,6 +139,7 @@
     
     
 
+    <script src="js/ohelper.js"></script>
     <script src="js/options.js"></script>
     
   </body>

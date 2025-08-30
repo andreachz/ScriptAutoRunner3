@@ -586,3 +586,7 @@
 .no-select{
   user-select: none;
 }
+
+.no-page-scroll {
+  overscroll-behavior: contain; /* prevents wheel from scrolling page */
+}
