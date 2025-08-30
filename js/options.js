@@ -19,17 +19,6 @@ document.getElementById("info-btn").addEventListener("click", function () {
 });
 
 
-window.addEventListener("storage", (event) => {
-  if(event.key == _POPUP_STORAGE_CHANGE_KEY){
-    window.location.reload()
-  }
-  console.log("Storage changed!");
-  console.log("key:", event.key);
-  console.log("oldValue:", event.oldValue);
-  console.log("newValue:", event.newValue);
-  console.log("url:", event.url);
-});
-
 (function () {
   // Defaults & keys
   const DEFAULT_SCRIPT = {
@@ -403,6 +392,20 @@ function genericDownload(e, index) {
   }4
 }
 
+window.addEventListener("storage", (event) => {
+  if(event.key == _POPUP_STORAGE_CHANGE_KEY){
+    window.location.reload()
+  }
+  console.log("Storage changed!");
+  console.log("key:", event.key);
+  console.log("oldValue:", event.oldValue);
+  console.log("newValue:", event.newValue);
+  console.log("url:", event.url);
+});
+
+// window.addEventListener("resize", (event) => {
+
+// });
 
 function maxMinScriptBox(e, index) {
   const behave = 'auto'
@@ -427,8 +430,12 @@ function maxMinScriptBox(e, index) {
     // el.style.position = "fixed";
     // el.style.top = "0px";
     // el.style.left = "0px";
-    textbox.style.width = (window.innerWidth - 220) + "px";
-    textbox.style.height = (window.innerHeight - 90) + "px";
+
+    // textbox.style.width = (window.innerWidth - 220) + "px";
+    // textbox.style.height = (window.innerHeight - 90) + "px";
+    textbox.style.width = 'calc( 100vw - 220px )';
+    textbox.style.height = 'calc( 100vh - 90px )';
+    
     // el.style.zIndex = "9999";
 
     window.scrollTo({ top: scrollTop, behavior: behave });
@@ -592,6 +599,15 @@ function maxMinScriptBox(e, index) {
   scriptsList.addEventListener('mousedown', (e) => {
     const li = e.target.closest('li.sra-script'); if (!li) return;
     const index = parseInt(li.dataset.index, 10); if (Number.isNaN(index)) return;
+
+    if(e.target.closest('li.sra-script')){
+      let el = document.querySelectorAll('.sra-scripts .sra-script')[index]
+      if(el.dataset.boxstate=='maximized'){
+        const rect = el.getBoundingClientRect();
+        const scrollTop = window.scrollY + rect.top;
+        window.scrollTo({ top: scrollTop, behavior: 'smooth' });
+      }
+    }
 
 
     if (e.target.closest('.move-drag'))          {setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
