@@ -9,6 +9,8 @@ let oldScriptsDisposition;
 const DRAG_MOVE_V2 = true
 let mouseDragStartingState = {x: 0, y:0}
 let tout0
+let tout1
+let isPageScrolling
 //
 
 // max/min boxes
@@ -630,8 +632,8 @@ function maxMinScriptBox(e, index) {
 
     // textbox.style.width = (window.innerWidth - 220) + "px";
     // textbox.style.height = (window.innerHeight - 90) + "px";
-    textbox.style.width = 'calc( 100vw - 220px )';
-    textbox.style.height = 'calc( 100vh - 90px )';
+    textbox.style.width = 'calc( 100vw - 218px )';
+    textbox.style.height = 'calc( 100vh - 88px )';
     
     // el.style.zIndex = "9999";
     setTimeout(()=>{
@@ -754,8 +756,10 @@ function maxMinScriptBox(e, index) {
     // 2) Reorder DOM nodes in-place
     const fromEl = scriptsList.querySelector(`li[data-index="${fromIndex}"]`);
     const toEl   = scriptsList.querySelector(`li[data-index="${toIndex}"]`);
+    // console.log(fromEl, toEl)
     if (!fromEl || !toEl) { save(); return; }
 
+    
     // Move the existing node without recreating it
     if (fromIndex < toIndex) {
       // insert after `toEl`
@@ -784,6 +788,84 @@ function maxMinScriptBox(e, index) {
       }
     });
 
+    function swap(arr, fromIndex, toIndex) {
+    if (
+      !Array.isArray(arr) ||
+      fromIndex < 0 || fromIndex >= arr.length ||
+      toIndex < 0 || toIndex >= arr.length
+    ) {
+      throw new Error("Invalid indices or input array");
+    }
+    
+    oldScriptsDisposition = swapElementsGeometry(oldScriptsDisposition, fromIndex, toIndex)
+
+    /**
+ * Take an array/NodeList of elements, snapshot their rects,
+ * and return new rects as if elements at fromIndex and toIndex
+ * swapped positions (top/left). Width/height stay with each element.
+ *
+ * @param {Element[]|NodeListOf<Element>} elements
+ * @param {number} fromIndex
+ * @param {number} toIndex
+ * @returns {Array<{x:number,y:number,top:number,left:number,right:number,bottom:number,width:number,height:number}>}
+ */
+function swapElementsGeometry(elements, fromIndex, toIndex) {
+  const arr = Array.from(elements);
+
+  if (
+    !Array.isArray(arr) ||
+    fromIndex < 0 || fromIndex >= arr.length ||
+    toIndex < 0 || toIndex >= arr.length
+  ) {
+    throw new Error("Invalid indices or input elements");
+  }
+
+  // Snapshot current rects
+  // const rects = arr.map(el => el.getBoundingClientRect());
+  const rects = arr.map(el => el.rect);
+
+  // Helper: move a rect to a new anchor (top/left),
+  // keeping its own width/height and recomputing right/bottom, x/y.
+  const reproject = (rect, anchor) => {
+    const width = rect.width;
+    const height = rect.height;
+    const left = anchor.left;
+    const top = anchor.top;
+    return {
+      x: left,
+      y: top,
+      top,
+      left,
+      right: left + width,
+      bottom: top + height,
+      width,
+      height
+    };
+  };
+
+  // Build the “after swap” rects
+  const a = rects[fromIndex];
+  const b = rects[toIndex];
+
+  const after = rects.map((r, i) => {
+    if (i === fromIndex) return reproject(a, b); // A goes to B’s position
+    if (i === toIndex)   return reproject(b, a); // B goes to A’s position
+    return { ...r }; // unchanged (snapshot copy)
+  });
+
+  return after;
+}
+
+// // --- Example usage ---
+// const els = document.querySelectorAll('.sra-scripts .sra-script');
+// const swappedRects = swapElementsGeometry(els, 0, 3);
+// console.log(swappedRects[0], swappedRects[3]);
+
+
+  [arr[fromIndex], arr[toIndex]] = [arr[toIndex], arr[fromIndex]];
+  return arr;
+}
+
     // 4) Any per-item tooltips/editors that depend on index are still attached to the same DOM nodes.
     //    If your tooltip/editor logic *reads* data-index later, it's already updated above.
     setBtnsTooltips()
@@ -791,6 +873,7 @@ function maxMinScriptBox(e, index) {
   }
 
   const moveTo = moveTo__no_rerender
+  // const moveTo = moveTo__full_rerender
 
 
   function moveUp__full_rerender(index) {
@@ -875,11 +958,11 @@ function maxMinScriptBox(e, index) {
     }
 
 
-    if (e.target.closest('.move-drag'))          {setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
-    else if (e.target.closest('.sra-script__type'))   {setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
+    if (e.target.closest('.move-drag'))          {setMove(index, e); oldScriptsDisposition = getRectMap()  }
+    else if (e.target.closest('.sra-script__type'))   {setMove(index, e); oldScriptsDisposition = getRectMap();  }
     else if (e.target.closest('.sra-script__plug') || e.target.closest('.sra-script__btns')) {
       tout0 = setTimeout(()=>{
-        setMove(index, e); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  
+        setMove(index, e);  oldScriptsDisposition = getRectMap();  
       }, 220)
     }
     // else if (e.target.closest('.move-up'))          {setMove(index); oldScriptsDisposition=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
@@ -887,6 +970,24 @@ function maxMinScriptBox(e, index) {
     // else if (e.target.closest('.remove'))           removeScript(index, e);
     // else if (e.target.closest('.download'))         genericDownload(e, index);
   });
+
+
+  function cloneScripts(){
+    let originalNodes = document.querySelectorAll('.sra-scripts .sra-script');
+    let clonedNodes = Array.from(originalNodes, node => node.cloneNode(true)); // true = deep clone
+    return clonedNodes
+  }
+  
+  function getRectMap(){
+    let elementsWithRects = Array.from(
+      document.querySelectorAll('.sra-scripts .sra-script'),
+      el => ({
+        // element: el,
+        rect: el.getBoundingClientRect()
+      })
+    );
+    return elementsWithRects
+  }
 
   document.body.addEventListener('mouseup', (e) => {
     resetMove()
@@ -977,7 +1078,29 @@ function draggingTempdrag(e, index){
     }
 }
 
+document.addEventListener("scroll", () => {
+  // Clear the timeout on every scroll event
+  clearTimeout(tout1);
+  isPageScrolling=true
+  
+
+  // console.log("Scrolling...");
+
+  // Set a timeout to detect when scrolling ends
+  tout1 = setTimeout(() => {
+    // console.log("Stopped scrolling");
+    isPageScrolling=false
+  }, 150); // 150ms after last scroll event
+});
+
+
+
 document.addEventListener('mousemove', e => {
+
+  if(isPageScrolling){
+
+  }
+
   if (moveFromIndex === -1) return;
 
   const s = oldScriptsDisposition;
@@ -989,33 +1112,38 @@ document.addEventListener('mousemove', e => {
   const y = e.clientY;
 
   // before first
-  const firstTop = s[0].getBoundingClientRect().top;
+  const firstTop = s[0].rect.top;
   if (y < firstTop) {
     moveToIndex = 0
-    if(moveFromIndex!=moveToIndex)
-    moveTo(moveFromIndex, moveToIndex);
+    if(moveFromIndex!=moveToIndex){
+      moveTo(moveFromIndex, moveToIndex);
+      // oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-scripts .sra-script'));
+    }
+    
     moveFromIndex = 0;
-    oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-scripts .sra-script'));
+
     return;
   }
 
   // between items
   for (let i = 1; i < s.length; i++) {
-    const prevTop = s[i - 1].getBoundingClientRect().top;
-    const nextTop = s[i].getBoundingClientRect().top;
+    const prevTop = s[i - 1].rect.top;
+    const nextTop = s[i].rect.top;
     if (y >= prevTop && y < nextTop) {
       moveToIndex = i - 1
-      if(moveFromIndex!=moveToIndex)
-      moveTo(moveFromIndex, moveToIndex);
+      if(moveFromIndex!=moveToIndex){
+        moveTo(moveFromIndex, moveToIndex);
+        // oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-scripts .sra-script'));
+      }
       moveFromIndex = i - 1;
       
-      oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-scripts .sra-script'));
+      
       return;
     }
   }
   // alert(1)
   // AFTER LAST: use the bottom half of the last item
-  const lastRect = s[s.length - 1].getBoundingClientRect();
+  const lastRect = s[s.length - 1].rect;
   // const afterThreshold = (lastRect.top + lastRect.bottom) / 2; // midpoint
   // const afterThreshold = (lastRect.top + (lastRect.bottom - lastRect.top) / 100) ; // midpoint
   const afterThreshold = (lastRect.top) ; // midpoint
@@ -1023,12 +1151,16 @@ document.addEventListener('mousemove', e => {
   if (y >= afterThreshold) {
     // s.length means "insert after last"
     moveToIndex = s.length - 1
-    if(moveFromIndex!=moveToIndex)
-    moveTo(moveFromIndex, moveToIndex);
+    if(moveFromIndex!=moveToIndex){
+      moveTo(moveFromIndex, moveToIndex);
+      // oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-scripts .sra-script'));
+    }
     moveFromIndex = s.length - 1;
-    oldScriptsDisposition = Array.from(document.querySelectorAll('.sra-scripts .sra-script'));
+    
     return;
+    
   }
+
 });
 
 
