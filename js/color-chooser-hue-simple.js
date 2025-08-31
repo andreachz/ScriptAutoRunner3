@@ -8,6 +8,8 @@ const rgbChip = document.getElementById('rgbChip');
 const copyBtn = document.getElementById('copyHex');
 const resetBtn = document.getElementById('resetBtn');
 
+const SAR_COLOR_HSL = '_SAR_COLOR_HSL'
+
 function hslToRgb(h, s, l) {
   // h: 0-360, s: 0-1, l: 0-1
   h = ((h % 360) + 360) % 360; // clamp
@@ -58,16 +60,24 @@ function update(byUser=true) {
   // Apply to parent document (if embedded)
   try { window.parent.document.documentElement.style.setProperty('--main-color', hex); } catch {}
 
+  const slider = document.querySelector('input[type="range"].slider--sat');
+  slider.style.setProperty('--sat-slider-color', h); // or whatever value you want
+  const slider2 = document.querySelector('input[type="range"].slider--light');
+  slider2.style.setProperty('--sat-slider-color', h); // or whatever value you want
+  
+
+
+
   if (byUser) {
     // Save to localStorage
     const payload = { h, s: sPct, l: lPct, hex };
-    localStorage.setItem('_SAR_COLOR_HSL', JSON.stringify(payload));
+    localStorage.setItem(SAR_COLOR_HSL, JSON.stringify(payload));
   }
 }
 
 
 window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('_SAR_COLOR_HSL');
+  const saved = localStorage.getItem(SAR_COLOR_HSL);
   if (saved) {
     try {
       const { h, s, l, hex } = JSON.parse(saved);

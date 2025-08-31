@@ -5,7 +5,7 @@
   <title>Simple Hue Slider</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root { --h: 200; --s: 100; --l: 50; }
+    :root { --h: 200; --s: 100; --l: 50; --sat-slider-color: 0, --light-slider-color: 0 }
 
     html, body {
       height: 100%;
@@ -95,11 +95,12 @@
 
     input[type="range"].slider--sat::-webkit-slider-runnable-track{
       background: linear-gradient(90deg,
-        white 0%, #ff0000 100%);
+        grey 0%, hsl(var(--sat-slider-color, 0), 100%, 50%) 100%);
     }
+
     input[type="range"].slider--light::-webkit-slider-runnable-track{
       background: linear-gradient(90deg,
-        black 0%, white 100%);
+        black 0%,  hsl(var(--sat-slider-color, 0), 50%, 50%) 50%, white 100%);
     }
 
     /* Thumb */
