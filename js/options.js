@@ -197,8 +197,8 @@ document.getElementById("info-btn").addEventListener("click", function () {
 
   function renderScriptsCounterIndicator(){
     let totalScripts = state.scripts.length?state.scripts.length+' script'+((state.scripts.length!=1)?'s':''):'No scripts yet'
-    let activeScripts = state.scripts.length?', '+state.scripts.filter(x=>x.enable).length+' enabled':''
-    document.querySelector('.sra-noscripts').children[0].innerText=totalScripts+activeScripts
+    let activeScripts = state.scripts.length?`, <span style="opacity: ${state.power?'initial':'0.4'} ">`+state.scripts.filter(x=>x.enable).length+' enabled</span>':''
+    document.querySelector('.sra-noscripts').children[0].innerHTML=totalScripts+activeScripts
   }
 
 
@@ -388,6 +388,7 @@ function renderList() {
   function toggleSwitch() {
     state.power = !state.power;
     renderPower();
+    renderScriptsCounterIndicator()
     save();
   }
 

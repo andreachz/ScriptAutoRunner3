@@ -70,7 +70,8 @@ function update(byUser=true) {
 
   if (byUser) {
     // Save to localStorage
-    const payload = { h, s: sPct, l: lPct, hex };
+    // const payload = { h, s: sPct, l: lPct, hex };
+    const payload = { hex };
     localStorage.setItem(SAR_COLOR_HSL, JSON.stringify(payload));
   }
 }
@@ -80,7 +81,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem(SAR_COLOR_HSL);
   if (saved) {
     try {
-      const { h, s, l, hex } = JSON.parse(saved);
+      const { hex } = JSON.parse(saved);
+      const {h, s, l} = hexToHSL(hex)
       if (Number.isFinite(h)) hue.value = h;
       if (Number.isFinite(s)) sat.value = s;
       if (Number.isFinite(l)) light.value = l;
@@ -163,8 +165,15 @@ function hexToHSL(hex) {
 // Reset to a nice default (matching initial values)
 resetBtn.addEventListener('click', setDefault);
 
+let defaultsIndexColor = 0
+
 function setDefault(){
-  const default_ = '#F3D32F'
+
+  const defaults = ['#F3D32F', '#b5dbad', '#a7d8e2']
+
+  const default_ = defaults[defaultsIndexColor]
+  defaultsIndexColor = (defaultsIndexColor+1)%defaults.length
+
   let hsldef = hexToHSL(default_)
   hue.value = hsldef.h
   sat.value = hsldef.s
