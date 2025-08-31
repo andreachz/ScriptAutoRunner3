@@ -32,6 +32,8 @@ The original extension relied on features no longer supported in MV3 and could n
   - Added button for script download or full data export.  
   - Added drag-and-drop support for moving and rearranging scripts.
   - Added deletion options with key combinations on delete button.  
+  - Added script duplicate button.
+  - Added theme color chooser in options menu.
   - UI/UX visual improvements and bugfixes.
 
 ### UI overview
