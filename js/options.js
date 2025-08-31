@@ -404,10 +404,10 @@ function renderList() {
 // Reuse the same factory
 function addScript__no_rerender(type, atIndex, custom_s) {
   // 1) build the new script object
-  const s = custom_s || clone(DEFAULT_SCRIPT);
+  const s = clone(custom_s || DEFAULT_SCRIPT) || clone(DEFAULT_SCRIPT);
   s.id = getAvailableId();
   s.type = type;
-  s.name = `${s.name}${s.id}`;
+  s.name = custom_s?s.name:`${s.name}${s.id}`;
 
   // 2) normalize index (default append)
   const n = state.scripts.length;
@@ -588,7 +588,34 @@ function genericDownload(e, index) {
     URL.revokeObjectURL(url); // clean up
   } else {
     downloadScript(index);
-  }4
+  }
+}
+function duplicate(e, index) {
+  let d = clone(state.scripts[index])
+  // d.name+=' (copy)'
+
+function dupName(name) {
+  const baseMatch = name.match(/^(.*?)(?: \(copy(?: (\d+))?\))?$/);
+  const baseName = baseMatch[1];
+  let num = baseMatch[2] ? parseInt(baseMatch[2], 10) + 1 : 0;
+
+  let dupname = num === 0 
+    ? `${baseName} (copy)` 
+    : `${baseName} (copy ${num})`;
+
+  let i = num;
+  while (state.scripts.some(x => x.name === dupname)) {
+    i++;
+    dupname = `${baseName} (copy ${i+1})`;
+    if (i > 1000) break; // safety stop
+  }
+
+  return dupname;
+}
+
+  d.name = dupName(d.name)
+
+  addScript(d.type, index+1, d)
 }
 
 window.addEventListener("storage", (event) => {
@@ -632,6 +659,9 @@ function maxMinScriptBox(e, index) {
 
     // textbox.style.width = (window.innerWidth - 220) + "px";
     // textbox.style.height = (window.innerHeight - 90) + "px";
+    el.dataset.width = textbox.style.width;
+    el.dataset.height = textbox.style.height;
+
     textbox.style.width = 'calc( 100vw - 220px )';
     textbox.style.height = 'calc( 100vh - 90px )';
     
@@ -646,17 +676,22 @@ function maxMinScriptBox(e, index) {
 
 
     el.dataset.boxstate = "maximized";
+
   } else {
     window.scrollTo({ top: initialYScrollState, behavior: behave });
     // Reset styles back to default
     // el.style.position = "";
     // el.style.top = "";
     // el.style.left = "";
-    textbox.style.width = "";
-    textbox.style.height = "";
+
+    // textbox.style.width = "";
+    // textbox.style.height = "";
+    textbox.style.width = el.dataset.width;
+    textbox.style.height = el.dataset.height;
+    
     // el.style.zIndex = "";
     if(el.querySelector('.monaco-container'))
-    el.querySelector('.monaco-container').style.overflow = 'visible'
+    el.querySelector('.monaco-container').style.overflow = ''
     el.dataset.boxstate = "minimized";
   }
 }
@@ -875,6 +910,7 @@ function maxMinScriptBox(e, index) {
     else if (e.target.closest('.move-down'))        moveDown(index);
     else if (e.target.closest('.remove'))           removeScript(index, e);
     else if (e.target.closest('.download'))         genericDownload(e, index);
+    else if (e.target.closest('.duplicate'))         duplicate(e, index);
     else if (e.target.closest('.max-min-btn'))          maxMinScriptBox(e, index);
   });
   
@@ -1278,12 +1314,12 @@ function renderEditor(){
   // choose one
   let s = localStorage.getItem(SAR_EDITOR)
   if(s == 'codemirror'){
-    renderCodeMirror()
+    renderCodeMirrorEl()
   }
   else if( s=='monaco'){
     document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {ta.classList.remove('monaco')})
     document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {ta.classList.add('monaco')})
-    renderMonaco()
+    renderMonacoEl()
   }
   else{
     document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {ta.classList.remove('monaco')})

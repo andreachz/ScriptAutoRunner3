@@ -1,9 +1,15 @@
 [v-cloak] {
   display: none;
 }
+:root {
+  --main-color: #F3D32F;
+  /* --main-color: hsl(183, 89%, 57%); */
+  /* --main-color-transparent: #f3d32fe6; */
+  /* --main-color-transparent: #0091ff; */
+}
 html, body {
   background-color: #454851;
-  color: #F3D32F;
+  color: var(--main-color);
   margin: 0;
   padding: 0;
   height: 100%;

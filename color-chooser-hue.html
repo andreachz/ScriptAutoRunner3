@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Simple Hue Slider</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --h: 200; --s: 100; --l: 50; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #0b0c10;
+      color: #e8f0fe;
+      display: grid;
+      place-items: center;
+    }
+
+    .card {
+      width: min(640px, 92vw);
+      background: #12141a;
+      border: 1px solid #232634;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.35);
+    }
+
+    .row { display: grid; gap: 14px; }
+    .row--top {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+    .title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #c9d1ff;
+    }
+
+    /* The color preview */
+    .swatch {
+      width: 72px; height: 72px;
+      border-radius: 14px;
+      background: hsl(var(--h), calc(var(--s) * 1%), calc(var(--l) * 1%));
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 10px 24px rgba(0,0,0,.35);
+    }
+
+    /* Slider container */
+    .slider-wrap { display: grid; gap: 8px; }
+
+    label { color: #b8c1ec; font-weight: 600; }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 14px;
+      background: transparent;
+      margin: 4px 0 2px;
+    }
+
+    /* Track: show the rainbow */
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 14px; border-radius: 999px; border: 1px solid #2a2e3f;
+      background: linear-gradient(90deg,
+        #ff0000 0%, #ffff00 16.6%, #00ff00 33.3%,
+        #00ffff 50%, #0000ff 66.6%, #ff00ff 83.3%, #ff0000 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+    }
+    input[type="range"]::-moz-range-track {
+      height: 14px; border-radius: 999px; border: 1px solid #2a2e3f;
+      background: linear-gradient(90deg,
+        #ff0000 0%, #ffff00 16.6%, #00ff00 33.3%,
+        #00ffff 50%, #0000ff 66.6%, #ff00ff 83.3%, #ff0000 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+    }
+
+    /* Thumb */
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #10131a;
+      box-shadow: 0 2px 10px rgba(0,0,0,.35);
+      margin-top: -4px; /* centers over 14px track */
+      cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #10131a;
+      box-shadow: 0 2px 10px rgba(0,0,0,.35);
+      cursor: pointer;
+    }
+    input[type="range"]:focus { outline: none; }
+    input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 3px solid #90caf9; }
+    input[type="range"]:focus-visible::-moz-range-thumb { outline: 3px solid #90caf9; }
+
+    /* Value chips */
+    .values {
+      display: grid; gap: 10px;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      align-items: center;
+    }
+    .chip {
+      background: #171a23;
+      border: 1px solid #2a2e3f;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      color: #dbe8ff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    button.copy {
+      background: #2a2e3f;
+      border: 1px solid #3a3f53;
+      color: #e8f0fe;
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: transform .06s ease;
+    }
+    button.copy:active { transform: translateY(1px); }
+    .note { color: #98a2b3; font-size: .9rem; }
+
+    .ticks {
+      display: flex; justify-content: space-between; font-size: 12px; color: #8d96b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="group" aria-label="Hue color chooser">
+    <div class="row row--top">
+      <div class="title">Hue</div>
+      <div class="swatch" id="swatch" role="img" aria-label="Selected color preview"></div>
+    </div>
+
+    <div class="row slider-wrap" style="margin-top:10px">
+      <label for="hue">0–360°</label>
+      <input id="hue" type="range" min="0" max="360" value="200" step="1" />
+      <div class="ticks"><span>0</span><span>60</span><span>120</span><span>180</span><span>240</span><span>300</span><span>360</span></div>
+    </div>
+
+    <div class="row" style="margin-top:14px">
+      <div class="values">
+        <div class="chip" id="hslChip">hsl(200, 100%, 50%)</div>
+        <div class="chip" id="hexChip">#33aaff</div>
+        <div class="chip" id="rgbChip">rgb(51, 170, 255)</div>
+        <button class="copy" id="copyHex" type="button" title="Copy HEX">Copy HEX</button>
+      </div>
+      <div class="note">Saturation is 100% and Lightness is 50% to show pure hue.</div>
+    </div>
+  </div>
+
+  <script>
+    const hue = document.getElementById('hue');
+    const swatch = document.getElementById('swatch');
+    const hslChip = document.getElementById('hslChip');
+    const hexChip = document.getElementById('hexChip');
+    const rgbChip = document.getElementById('rgbChip');
+    const copyBtn = document.getElementById('copyHex');
+
+    function hslToRgb(h, s, l) {
+      // h: 0-360, s: 0-1, l: 0-1
+      h = ((h % 360) + 360) % 360; // clamp
+      s = Math.max(0, Math.min(1, s));
+      l = Math.max(0, Math.min(1, l));
+      const c = (1 - Math.abs(2 * l - 1)) * s;
+      const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+      const m = l - c / 2;
+      let r1=0, g1=0, b1=0;
+      if (0 <= h && h < 60)      { r1=c; g1=x; b1=0; }
+      else if (60 <= h && h <120){ r1=x; g1=c; b1=0; }
+      else if (120<= h && h<180){ r1=0; g1=c; b1=x; }
+      else if (180<= h && h<240){ r1=0; g1=x; b1=c; }
+      else if (240<= h && h<300){ r1=x; g1=0; b1=c; }
+      else                       { r1=c; g1=0; b1=x; }
+      const r = Math.round((r1 + m) * 255);
+      const g = Math.round((g1 + m) * 255);
+      const b = Math.round((b1 + m) * 255);
+      return { r, g, b };
+    }
+
+    function toHex(n) {
+      return n.toString(16).padStart(2, '0');
+    }
+
+    function update() {
+      const h = Number(hue.value);
+      const s = 1, l = 0.5;
+      const { r, g, b } = hslToRgb(h, s, l);
+      const hex = `#${toHex(r)}${toHex(g)}${toHex(b)}`.toLowerCase();
+
+      // Visuals
+      document.documentElement.style.setProperty('--h', h);
+      swatch.style.background = `hsl(${h} 100% 50%)`;
+      swatch.setAttribute('aria-label', `Selected color ${hex}`);
+
+      // Readouts
+      hslChip.textContent = `hsl(${h}, 100%, 50%)`;
+      hexChip.textContent = hex;
+      rgbChip.textContent = `rgb(${r}, ${g}, ${b})`;
+    }
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(hexChip.textContent);
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => (copyBtn.textContent = 'Copy HEX'), 900);
+      } catch {
+        // Fallback: select text in the chip
+        const range = document.createRange();
+        range.selectNodeContents(hexChip);
+        const sel = window.getSelection();
+        sel.removeAllRanges(); sel.addRange(range);
+        alert('Select + copy the HEX value.');
+      }
+    });
+
+    hue.addEventListener('input', update);
+    update(); // initial render
+  </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HSLA ↔ RGBA Color Chooser</title>
+  <style>
+    :root{
+      --bg:#0b0d10; --panel:#131720; --muted:#a6adbb; --ring:#4f46e5; --border:#232835;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji";
+      background:linear-gradient(120deg,#0b0d10,#0d1117 40%,#0a0a0b);
+      color:#e5e7eb; display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .app{
+      width:min(1000px,100%);
+      display:grid; gap:16px;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 880px){ .app{ grid-template-columns: 1fr; } }
+    .card{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow: 0 10px 30px rgba(0,0,0,.25);}
+    .title{ display:flex; gap:10px; align-items:center; margin:0 0 8px; font-size:18px; font-weight:700; letter-spacing:.2px; }
+    .subtitle{ margin:2px 0 14px; color:var(--muted); font-size:13px }
+    .row{ display:grid; grid-template-columns: 120px 1fr 84px; gap:10px; align-items:center; padding:8px 0; }
+    .row label{ color:#d1d5db; font-size:13px }
+    input[type="range"]{ width:100% }
+    input[type="range"], input[type="number"]{
+      accent-color: var(--ring);
+    }
+    input[type="number"], input[type="text"]{
+      width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:#0f1420; color:#e5e7eb;
+      outline: none; box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    input[type="number"]:focus, input[type="text"]:focus{ border-color:#2f3657; box-shadow:0 0 0 3px rgba(79,70,229,.25) }
+    .preview{ height: 280px; border-radius:16px; border:1px solid var(--border); position:relative; overflow:hidden; }
+    .checker{ position:absolute; inset:0; background-image: linear-gradient(45deg,#11131a 25%,transparent 25%), linear-gradient(-45deg,#11131a 25%,transparent 25%), linear-gradient(45deg,transparent 75%,#11131a 75%), linear-gradient(-45deg,transparent 75%,#11131a 75%); background-size:24px 24px; background-position: 0 0, 0 12px, 12px -12px, -12px 0px; opacity:.7 }
+    .swatch{ position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:space-between; padding:14px; font-weight:600 }
+    .pill{ background: rgba(0,0,0,.45); backdrop-filter: blur(8px); padding:8px 10px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,.06) }
+    .controls{ display:grid; grid-template-columns: 1fr 1fr; gap:16px }
+    @media (max-width: 640px){ .controls{ grid-template-columns: 1fr } }
+    .copyline{ display:flex; gap:8px; }
+    .btn{ border:1px solid var(--border); background:#0e1220; color:#e5e7eb; padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:600 }
+    .btn:hover{ border-color:#2b2f46 }
+    .small{ font-size:12px; color:var(--muted); margin-top:6px }
+    .footer{ text-align:center; color:var(--muted); font-size:12px }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="card" style="grid-column: 1 / -1">
+      <h1 class="title">🎨 HSLA ↔ RGBA Color Chooser</h1>
+      <p class="subtitle">Two-way bound sliders + precise numeric inputs. Copy either color string. Alpha is fully supported.</p>
+      <div class="preview" aria-label="Color preview">
+        <div class="checker" aria-hidden="true"></div>
+        <div class="swatch" id="swatch">
+          <div class="pill" id="contrastLabel">Contrast</div>
+          <div class="pill" id="hexLabel">#000000</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="title">HSLA</h2>
+      <div class="row"><label for="h">Hue (0–360)</label><input type="range" id="h" min="0" max="360" step="1"><input id="hn" type="number" min="0" max="360"></div>
+      <div class="row"><label for="s">Saturation (0–100%)</label><input type="range" id="s" min="0" max="100" step="1"><input id="sn" type="number" min="0" max="100"></div>
+      <div class="row"><label for="l">Lightness (0–100%)</label><input type="range" id="l" min="0" max="100" step="1"><input id="ln" type="number" min="0" max="100"></div>
+      <div class="row"><label for="a">Alpha (0–1)</label><input type="range" id="a" min="0" max="1" step="0.01"><input id="an" type="number" min="0" max="1" step="0.01"></div>
+      <div class="copyline"><input id="hslaOut" type="text" readonly><button class="btn" id="copyHSLA" title="Copy HSLA">Copy HSLA</button></div>
+      <div class="small">Tip: Use the HSLA sliders; RGBA updates automatically.</div>
+    </section>
+
+    <section class="card">
+      <h2 class="title">RGBA</h2>
+      <div class="row"><label for="r">Red (0–255)</label><input type="range" id="r" min="0" max="255" step="1"><input id="rn" type="number" min="0" max="255"></div>
+      <div class="row"><label for="g">Green (0–255)</label><input type="range" id="g" min="0" max="255" step="1"><input id="gn" type="number" min="0" max="255"></div>
+      <div class="row"><label for="b">Blue (0–255)</label><input type="range" id="b" min="0" max="255" step="1"><input id="bn" type="number" min="0" max="255"></div>
+      <div class="row"><label for="ra">Alpha (0–1)</label><input type="range" id="ra" min="0" max="1" step="0.01"><input id="ran" type="number" min="0" max="1" step="0.01"></div>
+      <div class="copyline"><input id="rgbaOut" type="text" readonly><button class="btn" id="copyRGBA" title="Copy RGBA">Copy RGBA</button></div>
+      <div class="small">Tip: Prefer typing exact integers here for pixel-perfect colors.</div>
+    </section>
+
+    <section class="card" style="grid-column: 1 / -1">
+      <div class="title">Extras</div>
+      <div class="row" style="grid-template-columns: 160px 1fr 140px">
+        <label for="hexIn">HEX (#RRGGBB or #RRGGBBAA)</label>
+        <input id="hexIn" type="text" placeholder="#1e90ff">
+        <button class="btn" id="applyHex">Apply</button>
+      </div>
+      <div class="small">HEX ignores hue/saturation/lightness nuances when converting back, but it's handy for pasting colors.</div>
+    </section>
+
+    <footer class="footer" style="grid-column: 1 / -1">Built with vanilla HTML/CSS/JS. No dependencies.</footer>
+  </div>
+
+<script>
+  // ---------- Utilities ----------
+  const clamp = (v,min,max) => Math.min(Math.max(v, min), max);
+  const round = (v, p=2) => Math.round(v * (10**p)) / (10**p);
+  const to255 = v => clamp(Math.round(v*255), 0, 255);
+
+  function hslaToRgba(h, s, l, a){
+    // h: 0–360, s/l: 0–100, a: 0–1
+    h = ((h%360)+360)%360; s = clamp(s,0,100)/100; l = clamp(l,0,100)/100; a = clamp(+a,0,1);
+    if (s === 0){ const v = to255(l); return {r:v,g:v,b:v,a}; }
+    const q = l < 0.5 ? l*(1+s) : l + s - l*s;
+    const p = 2*l - q;
+    const hk = h/360;
+    const hue2rgb = (p,q,t)=>{ if(t<0) t+=1; if(t>1) t-=1; if(t<1/6) return p + (q-p)*6*t; if(t<1/2) return q; if(t<2/3) return p + (q-p)*(2/3 - t)*6; return p; };
+    const r = to255(hue2rgb(p,q,hk+1/3));
+    const g = to255(hue2rgb(p,q,hk));
+    const b = to255(hue2rgb(p,q,hk-1/3));
+    return {r,g,b,a};
+  }
+
+  function rgbaToHsla(r,g,b,a){
+    // r/g/b: 0–255, a: 0–1
+    r = clamp(+r,0,255)/255; g = clamp(+g,0,255)/255; b = clamp(+b,0,255)/255; a = clamp(+a,0,1);
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h, s, l = (max+min)/2;
+    const d = max - min;
+    if (d === 0){ h = 0; s = 0; }
+    else {
+      s = d / (1 - Math.abs(2*l - 1));
+      switch(max){
+        case r: h = 60 * (((g - b) / d) % 6); break;
+        case g: h = 60 * (((b - r) / d) + 2); break;
+        default: h = 60 * (((r - g) / d) + 4);
+      }
+      if (h < 0) h += 360;
+    }
+    return { h: (h||0), s: s*100, l: l*100, a };
+  }
+
+  const els = {
+    // HSLA
+    h: document.getElementById('h'), s: document.getElementById('s'), l: document.getElementById('l'), a: document.getElementById('a'),
+    hn: document.getElementById('hn'), sn: document.getElementById('sn'), ln: document.getElementById('ln'), an: document.getElementById('an'),
+    hslaOut: document.getElementById('hslaOut'),
+    // RGBA
+    r: document.getElementById('r'), g: document.getElementById('g'), b: document.getElementById('b'), ra: document.getElementById('ra'),
+    rn: document.getElementById('rn'), gn: document.getElementById('gn'), bn: document.getElementById('bn'), ran: document.getElementById('ran'),
+    rgbaOut: document.getElementById('rgbaOut'),
+    // Misc
+    swatch: document.getElementById('swatch'), contrastLabel: document.getElementById('contrastLabel'), hexLabel: document.getElementById('hexLabel'),
+    hexIn: document.getElementById('hexIn'), applyHex: document.getElementById('applyHex'),
+    copyHSLA: document.getElementById('copyHSLA'), copyRGBA: document.getElementById('copyRGBA'),
+  };
+
+  let isUpdating = false;
+
+  // --- Sync helpers ---
+  function setHSLA(h,s,l,a){
+    isUpdating = true;
+    [els.h.value, els.hn.value] = [Math.round(h), Math.round(h)];
+    [els.s.value, els.sn.value] = [Math.round(s), Math.round(s)];
+    [els.l.value, els.ln.value] = [Math.round(l), Math.round(l)];
+    [els.a.value, els.an.value] = [round(a,2), round(a,2)];
+    const {r,g,b} = hslaToRgba(h,s,l,a);
+    setRGBA(r,g,b,a,false); // don't recurse HSLA from here
+    isUpdating = false;
+    updatePreview();
+  }
+
+  function setRGBA(r,g,b,a, updateH=true){
+    isUpdating = true;
+    r = clamp(Math.round(r),0,255); g = clamp(Math.round(g),0,255); b = clamp(Math.round(b),0,255);
+    [els.r.value, els.rn.value] = [r,r];
+    [els.g.value, els.gn.value] = [g,g];
+    [els.b.value, els.bn.value] = [b,b];
+    [els.ra.value, els.ran.value] = [round(a,2), round(a,2)];
+    if (updateH){ const {h,s,l} = rgbaToHsla(r,g,b,a); setHSLA(h,s,l,a); isUpdating=false; return; }
+    isUpdating = false;
+    updatePreview();
+  }
+
+  function updatePreview(){
+    const h = +els.hn.value, s = +els.sn.value, l = +els.ln.value, a = +els.an.value;
+    const {r,g,b} = hslaToRgba(h,s,l,a);
+    const hslaStr = `hsla(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%, ${round(a,2)})`;
+    const rgbaStr = `rgba(${r}, ${g}, ${b}, ${round(a,2)})`;
+    els.hslaOut.value = hslaStr; els.rgbaOut.value = rgbaStr;
+    els.swatch.style.background = rgbaStr;
+    const hex = rgbaToHex(r,g,b, Math.round(a*255));
+    els.hexLabel.textContent = hex.toUpperCase();
+    // Contrast chip
+    const on = idealTextColor(r,g,b,a);
+    els.swatch.style.color = on;
+    els.contrastLabel.textContent = `Text: ${on === '#000000' ? 'Black' : 'White'}`;
+  }
+
+  // --- Color math helpers ---
+  function rgbaToHex(r,g,b,a255){
+    const h = v => v.toString(16).padStart(2,'0');
+    return `#${h(r)}${h(g)}${h(b)}${a255<255? h(a255):''}`;
+  }
+  function hexToRgba(hex){
+    hex = hex.trim();
+    if (!/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(hex)) return null;
+    const val = hex.slice(1);
+    const r = parseInt(val.slice(0,2),16), g = parseInt(val.slice(2,4),16), b = parseInt(val.slice(4,6),16);
+    const a = val.length===8 ? parseInt(val.slice(6,8),16)/255 : 1;
+    return {r,g,b,a};
+  }
+  // simple perceived luminance (sRGB) for choosing black/white text
+  function idealTextColor(r,g,b/*,a*/){
+    // relative luminance approximation
+    const luminance = (0.2126*(r/255) + 0.7152*(g/255) + 0.0722*(b/255));
+    return luminance > 0.55 ? '#000000' : '#ffffff';
+  }
+
+  // --- Wire up events ---
+  const bindPair = (range, number, onChange) => {
+    const sync = v => { number.value = v; range.value = v; };
+    range.addEventListener('input', e=>{ if(isUpdating) return; sync(e.target.value); onChange(+e.target.value); });
+    number.addEventListener('input', e=>{ if(isUpdating) return; onChange(+e.target.value); });
+  };
+
+  // HSLA bindings
+  bindPair(els.h, els.hn, ()=> setHSLA(+els.h.value, +els.s.value, +els.l.value, +els.a.value));
+  bindPair(els.s, els.sn, ()=> setHSLA(+els.h.value, +els.s.value, +els.l.value, +els.a.value));
+  bindPair(els.l, els.ln, ()=> setHSLA(+els.h.value, +els.s.value, +els.l.value, +els.a.value));
+  bindPair(els.a, els.an, ()=> setHSLA(+els.h.value, +els.s.value, +els.l.value, +els.a.value));
+
+  // RGBA bindings
+  bindPair(els.r, els.rn, ()=> setRGBA(+els.r.value, +els.g.value, +els.b.value, +els.ra.value));
+  bindPair(els.g, els.gn, ()=> setRGBA(+els.r.value, +els.g.value, +els.b.value, +els.ra.value));
+  bindPair(els.b, els.bn, ()=> setRGBA(+els.r.value, +els.g.value, +els.b.value, +els.ra.value));
+  bindPair(els.ra, els.ran, ()=> setRGBA(+els.r.value, +els.g.value, +els.b.value, +els.ra.value));
+
+  // Copy buttons
+  const copy = async (input)=>{ try{ await navigator.clipboard.writeText(input.value); input.classList.add('copied'); setTimeout(()=>input.classList.remove('copied'), 600); }catch(e){ input.select(); document.execCommand('copy'); } };
+  els.copyHSLA.addEventListener('click', ()=> copy(els.hslaOut));
+  els.copyRGBA.addEventListener('click', ()=> copy(els.rgbaOut));
+
+  // HEX apply
+  els.applyHex.addEventListener('click', ()=>{
+    const val = els.hexIn.value.trim();
+    const c = hexToRgba(val);
+    if(!c){ els.hexIn.style.borderColor = '#dc2626'; setTimeout(()=> els.hexIn.style.borderColor='var(--border)', 800); return; }
+    setRGBA(c.r,c.g,c.b,c.a);
+  });
+  els.hexIn.addEventListener('keydown', (e)=>{ if(e.key==='Enter') els.applyHex.click(); });
+
+  // Initialize with a nice color
+  setHSLA(210, 90, 56, 0.85);
+</script>
+</body>
+</html>

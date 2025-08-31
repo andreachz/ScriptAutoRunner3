@@ -38,7 +38,7 @@
   .sra-setting__body {
     color: #454851;
     border: 1px solid #656565;
-    background-color: #F3D32F;
+    background-color: var(--main-color);
     text-align: left;
     font-size: 14px;
     width: 500px;
@@ -75,7 +75,7 @@
     display: flex;
     align-items: center;
     background-color: #454851;
-    color: #F3D32F;
+    color: var(--main-color);
     padding: 5px 10px;
   }
   .sra-setting__header span:nth-of-type(1) {
@@ -98,14 +98,14 @@
   left:0;
   text-align: center;
   color: #454851;
-  background-color: #F3D32F;
+  background-color: var(--main-color);
   z-index: 1;
   cursor: pointer;
-  box-shadow: -1px 0 12px 0px rgba(243, 211, 47, 0.9);
+  box-shadow: -1px 0 12px 0px var(--main-color);
 }
 .sra-power--off {
   background-color: #656565;
-  color: #F3D32F;
+  color: var(--main-color);
   box-shadow: initial;
 }
   .sra-power .icon-flash {
@@ -130,7 +130,7 @@
 .sra-power--off + .sra-main .sra-script:before,
 .sra-power--off + .sra-main .sra-script__plug,
 .sra-power--off + .sra-main .sra-script__plug:before {
-  color: #F3D32F;
+  color: var(--main-color);
   background-color: #656565 !important;
 }
 .sra-power--off + .sra-main .sra-script__plug:after {
@@ -141,7 +141,7 @@
   position: relative;
   margin-top: 10px;
   padding: 1px;
-  background-color: #F3D32F;
+  background-color: var(--main-color);
   display: inline-block;
   font-size: 15px;
   z-index: 2;
@@ -178,7 +178,7 @@
     top: 0;
     bottom: 0;
     right: 226px;
-    color: #F3D32F;
+    color: var(--main-color);
     text-align: center;
     font-size: 30px;
   }
@@ -203,7 +203,7 @@
   }
   .src-btn--plus {
     float: left;
-    background-color: #F3D32F;
+    background-color: var(--main-color);
     color: #454851;
     border: none;
     font-size: 20px;
@@ -255,7 +255,7 @@
   position: fixed;
   top: 0;
   right: 0;
-  transform: scale(1.03);
+  transform: scale(1.05);
   /* transform-origin: top left; */
   z-index: 100;
   opacity: 0.9;
@@ -281,7 +281,7 @@
 
 .sra-script--enable {
   color: #454851;
-  background-color: #F3D32F;
+  background-color: var(--main-color);
 }
   .sra-script:before {
     content: '';
@@ -308,8 +308,8 @@
     cursor: pointer;
   }
   .sra-script--enable .sra-script__plug {
-    background-color: #F3D32F;
-    color: #F3D32F;
+    background-color: var(--main-color);
+    color: var(--main-color);
     width: 64px;
   }
   .sra-script__plug:before {
@@ -333,7 +333,7 @@
     -webkit-font-smoothing: antialiased;
     line-height: 33px;
     text-align: center;
-    color: #F3D32F;
+    color: var(--main-color);
   }
   .sra-script--enable .sra-script__plug:before {
     color: #454851;
