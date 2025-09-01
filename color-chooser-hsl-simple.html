@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <title>Simple Hue Slider</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/fontello-embedded2.css" media="screen" charset="utf-8">
   <style>
     :root { --h: 200; --s: 100; --l: 50; --sat-slider-color: 0, --light-slider-color: 0 }
 
@@ -28,7 +29,7 @@
     }
     .card {
       /* width: min(640px, 92vw); */
-      width: 96vw;
+      width: 100vw;
       padding: 1;
       
     }
@@ -185,7 +186,7 @@
 <body>
 <div class="card" role="group" aria-label="HSL color chooser">
 <div class="row row--top">
-<div class="title">Pick color theme</div>
+<div class="title"><span><i class="icon2-brush"></i></span> Pick color theme</div>
 <div style="display: flex; gap: 10px; align-items:center;">
 <button id="resetBtn" style="margin: 4px;" title="Left/Right click to choose one of the default colors">Defaults</button>
 <!-- <button id="resaetBtn" style="margin: 4px;" title="Left/Right click to choose one of the default colors">Defaults<br><small>ponk</small></button> -->
