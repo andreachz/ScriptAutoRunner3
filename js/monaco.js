@@ -63,7 +63,7 @@ function _renderMonaco() {
     inherit: true,    // keep all the normal token colors
     rules: [],
     colors: {
-        'editor.background': '#ffffff60',
+        'editor.background': '#ffffff50',
         'editorGutter.background': '#ffffff80',
         'minimap.background': '#ffffff80',
 
@@ -221,7 +221,7 @@ function _renderMonacoEl(index) {
       inherit: true,
       rules: [],
       colors: {
-        'editor.background': '#ffffff60',
+        'editor.background': '#ffffff50',
         'editorGutter.background': '#ffffff80',
         'minimap.background': '#ffffff80',
         'focusBorder': '#00000000',

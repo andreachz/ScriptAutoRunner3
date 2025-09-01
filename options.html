@@ -42,7 +42,7 @@
                 <span><i class="icon-cloud-flash"></i></span>
                 <span> Exclude hostname</span>
               </div>
-              <textarea id="excludeText" placeholder="Exclude hostnames, split by comma" name="exclude__text"></textarea>
+              <textarea style="resize: vertical;" id="excludeText" placeholder="Exclude hostnames, split by comma" name="exclude__text"></textarea>
               <hr>
               <div class="">
                 <span><i class="icon2-doc-text"></i></span>
@@ -119,11 +119,12 @@
                 <i class="type-icon"></i>
               </div>
               <div class="sra-script__snippet">
+                <!-- <div class="monaco-loading" hidden>Loading Monaco...</div> -->
                 <textarea class="code monaco no-page-scroll" placeholder="Write your own code here." name="script__snippet"></textarea>
               </div>
               <div class="sra-script__external">
                 <input class="src" type="text" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)" name="script__external">
-                <div class="padding-external" style="height: 150px; opacity: 1;overflow: hidden; resize: both; min-width: 730px;"></div>
+                <div class="padding-external" style="height: 150px; opacity: 1;overflow: hidden; resize: both; min-width: 732px;"></div>
               </div>
             </div>
             <div class="sra-flex sra-flex--foot">
@@ -132,7 +133,7 @@
                 <input class="sra-script__host host" placeholder="Target hostnames, split by comma. By default, target to all host." name="script__host">
               </div>
               
-              <button class="sra-script__btn duplicate" title="Duplicate" style="transform: scale(97%) translateX(5px);"><i class="icon2-docs"></i></button>
+              <button class="sra-script__btn duplicate" title="Duplicate this script" style="transform: scale(97%) translateX(5px);"><i class="icon2-docs"></i></button>
               <button class="sra-script__btn download" title="Download script. Shift+Click: export all data"><i class="icon2-download"></i></button>
               <button class="sra-script__btn remove" title="Shift+Click: delete without confirm. Ctrl+Shift+Click: delete all"><i class="icon-trash"></i></button>
             </div>

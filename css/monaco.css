@@ -1,12 +1,25 @@
 /* Make the original textarea invisible but present,
     so things like form validation can still reference it if needed. */
-textarea.monaco {
+/* textarea.monaco {
   position: absolute !important;
   left: -9999px !important;
   width: 0 !important;
   height: 0 !important;
   padding: 0 !important;
   border: 0 !important;
+} */
+textarea.monaco {
+  /* position: absolute !important;
+  left: -9999px !important; */
+  width: 700px !important;
+  height: 0px;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 0;
+  resize: none;
+  min-height: 0;
+  user-select: none;
+  pointer-events: none;
 }
 .monaco-wrapper {
   /* margin: 0.5rem 0 1rem; */
@@ -18,7 +31,13 @@ textarea.monaco {
   overflow: auto;      /* required for resize handle to show */
   min-width: 730px;
   width: 700px;
+  min-height: 40px;
   /* transition: width 0.15s ease-in-out,
               height 0.15s ease-in-out */
   /* background: transparent; */
+}
+
+.monaco-loading{
+  position: absolute;
+  z-index: 0;
 }

@@ -371,10 +371,10 @@ function renderList() {
 
   function setBtnsTooltips(){
     document.querySelectorAll('.sra-script__btn.download').forEach((el) => {
-      el.title = '[Click] to download script\n[Shift+Click] to export all data'
+      el.title = '[Click] to download this script\n[Shift+Click] to export all data'
     })
     document.querySelectorAll('.sra-script__btn.remove').forEach((el) => {
-      el.title = '[Click] to delete\n[Shift+Click] to delete without confirm\n[Ctrl+Shift+Click] to delete all'
+      el.title = '[Click] to delete this script\n[Shift+Click] to delete without confirm\n[Ctrl+Shift+Click] to delete all scripts'
     })
   }
 
@@ -792,7 +792,7 @@ function maxMinScriptBox(e, index) {
     // 2) Reorder DOM nodes in-place
     const fromEl = scriptsList.querySelector(`li[data-index="${fromIndex}"]`);
     const toEl   = scriptsList.querySelector(`li[data-index="${toIndex}"]`);
-    console.log(fromEl, toEl)
+    
     if (!fromEl || !toEl) { save(); return; }
 
     
@@ -1038,11 +1038,11 @@ document.addEventListener("scroll", () => {
   isPageScrolling=true
   
 
-  console.log("Scrolling...");
+  // console.log("Scrolling...");
 
   // Set a timeout to detect when scrolling ends
   tout1 = setTimeout(() => {
-    console.log("Stopped scrolling");
+    // console.log("Stopped scrolling");
     isPageScrolling=false
   }, 150); // 150ms after last scroll event
 });
@@ -1314,12 +1314,14 @@ function setupDragAndDrop() {
 function renderEditor(){
   // choose one
   let s = localStorage.getItem(SAR_EDITOR)
+  // document.querySelectorAll('.monaco-loading').forEach((ta) => {ta.hidden=true})
   if(s == 'codemirror'){
     renderCodeMirrorEl()
   }
   else if( s=='monaco'){
     document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {ta.classList.remove('monaco')})
     document.querySelectorAll('.sra-scripts textarea.code').forEach((ta) => {ta.classList.add('monaco')})
+    // document.querySelectorAll('.monaco-loading').forEach((ta) => {ta.hidden=false})
     renderMonacoEl()
   }
   else{

@@ -65,8 +65,10 @@ function update(byUser=true) {
   const slider2 = document.querySelector('input[type="range"].slider--light');
   slider2.style.setProperty('--sat-slider-color', h); // or whatever value you want
   
-
-
+  let defaultColor = color_defaults.find(x=>x.hex.toLowerCase() == hex.toLowerCase())
+  if(defaultColor){
+    resetBtnInner(defaultColor)
+  }
 
   if (byUser) {
     // Save to localStorage
@@ -113,9 +115,9 @@ copyBtn.addEventListener('click', async () => {
   }
 });
 
-hue.addEventListener('input', () => update());
-sat.addEventListener('input', () => update());
-light.addEventListener('input', () => update());
+hue.addEventListener('input', () => {update(); resetBtn.innerText='Defaults'});
+sat.addEventListener('input', () => {update(); resetBtn.innerText='Defaults'});
+light.addEventListener('input', () => {update(); resetBtn.innerText='Defaults'});
 
 function hexToHSL(hex) {
   // Remove leading "#"
@@ -156,27 +158,78 @@ function hexToHSL(hex) {
   }
 
   return {
-    h: Math.round(h * 360),      // 0–360
-    s: Math.round(s * 100),      // 0–100%
-    l: Math.round(l * 100)       // 0–100%
+    h: h * 360,      // 0–360
+    s: s * 100,      // 0–100%
+    l: l * 100       // 0–100%
   };
 }
 
 // Reset to a nice default (matching initial values)
 resetBtn.addEventListener('click', setDefault);
+resetBtn.addEventListener("contextmenu", setDefault)
+
+
+const color_defaults = [
+  // yellow
+  { hex: '#f3d230'||'#F3D32F', name: 'original', desc: 'gold' }, // yellow original default
+  
+  // yellow
+  { hex: '#e6e3a2', name: 'canary', desc: 'light yellow' },
+  { hex: '#d2cb4b', name: 'chaff', desc: 'yellow' },
+  
+  // green
+  { hex: '#b5dbad', name: 'soap', desc: 'light green' },
+  { hex: '#88bf7d', name: 'grass', desc: 'green' },
+
+  // blue
+  { hex: '#a7d8e2', name: 'sky', desc: 'light blue' },
+  { hex: '#7daabf', name: 'night', desc: 'blue' },
+
+  // red
+  { hex: '#dbadad', name: 'ham', desc: 'light red' },
+  { hex: '#c67676', name: 'ferrari', desc: 'red' },
+
+  // pink
+  { hex: '#dbadd7', name: 'petal', desc: 'light pink' },
+  { hex: '#c478be', name: 'barbie', desc: 'pink' },
+
+];
 
 let defaultsIndexColor = 0
 
-function setDefault(){
+function setDefault(e){
+  
+  let back = 0
+  if (e.button === 2 || e.ctrlKey) { // right click
+    e.preventDefault()
+    back = -2
+  }
 
-  const defaults = ['#F3D32F', '#b5dbad', '#a7d8e2']
+  let current = JSON.parse(localStorage.getItem(SAR_COLOR_HSL))
 
-  const default_ = defaults[defaultsIndexColor]
-  defaultsIndexColor = (defaultsIndexColor+1)%defaults.length
+  let idx = color_defaults.findIndex(x => x.hex === current.hex)
+  let nextIndex = (idx + 1 + back) % color_defaults.length
 
-  let hsldef = hexToHSL(default_)
+  // normalize negative modulo result
+  if (nextIndex < 0) {
+    nextIndex += color_defaults.length
+  }
+
+  defaultsIndexColor = nextIndex
+  // defaultsIndexColor = (defaultsIndexColor+1)%color_defaults.length
+
+  const default_ = color_defaults[defaultsIndexColor]
+
+
+  let hsldef = hexToHSL(default_.hex.toLowerCase())
+  resetBtnInner(default_)
   hue.value = hsldef.h
   sat.value = hsldef.s
   light.value = hsldef.l
   update();
+}
+
+
+function resetBtnInner(c){
+  resetBtn.innerHTML=`Defaults "${c.name}"<br><small>${c.desc}</small>`
 }
