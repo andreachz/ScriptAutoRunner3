@@ -9,7 +9,13 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["js/content.js"]
+      "js": ["js/content.js"],
+      
+      
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_about_blank": true
+      
     }
   ],
   "icons": {
@@ -26,9 +32,15 @@
   "permissions": [
     "storage",
     "tabs",
-    "scripting"
+    "scripting",
+
+    "webNavigation"
   ],
   "host_permissions": [
     "<all_urls>"
-  ]
+  ],
+  "web_accessible_resources": [{
+    "resources": ["js/frame-bridge.js","js/ext-apis.js"],
+    "matches": ["<all_urls>"]
+  }]
 }

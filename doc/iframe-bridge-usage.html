@@ -1,0 +1,67 @@
+<script>
+(async () => {
+  // 1) Ask extension to grant access to the iframe you care about
+  await window.ExtBridge.grant('#myFrame'); // CSS selector
+
+  // 2) Make an extApi call that the iframe bridge will proxy to background
+  const result = await window.ExtBridge.call('#myFrame', 'fetch', {
+    url: 'https://talkai.info/it/chat/send/',
+    init: {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json, text/event-stream',
+        'content-type': 'application/json'
+      },
+      // NOTE: This is a background fetch; cookies/CSRF rules still apply.
+      // For truly same-origin-with-cookies, call from inside the iframe page itself.
+      body: JSON.stringify({
+        type: 'chat',
+        messagesHistory: [{ id: crypto.randomUUID(), from: 'you', content: 'hello' }],
+        settings: { model: 'gpt-4.1-nano', temperature: 0.7 }
+      })
+    }
+  });
+
+  console.log('extApi result:', result);
+})();
+</script>
+
+
+<script>
+  (async ()=>{
+  // 1) Grant a specific iframe selector (once)
+await window.ExtBridge.grant('#myFrame');
+
+// 2) Run a page-world fetch inside that iframe (first-party cookies)
+const res = await window.ExtBridge.call('#myFrame', 'pageFetch', {
+  url: 'https://talkai.info/it/chat/send/',
+  init: {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json, text/event-stream',
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      type: 'chat',
+      messagesHistory: [{ id: crypto.randomUUID(), from: 'you', content: 'hello' }],
+      settings: { model: 'gpt-4.1-nano', temperature: 0.7 }
+    })
+  },
+  // optional: "json" to auto parse
+  responseType: 'text'
+});
+
+console.log('Result from iframe page-world:', res);
+/*
+res: {
+  _kind: "PF_RES",
+  id: "<callId>",
+  ok: true/false,
+  status: 200,
+  url: "...",
+  headers: { ... },
+  body: "<text or JSON>"
+}
+*/
+})()
+</script>

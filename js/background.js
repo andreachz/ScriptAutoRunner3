@@ -1,3 +1,4 @@
+// background.js
 // chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 //   var storageKey = 'SAR';
 //   var data = localStorage.getItem(storageKey);
@@ -28,6 +29,7 @@ const DEFAULT_DATA = {
 };
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request?.method !== "SARgetLocalStorage") return;
   if (request.method === "SARgetLocalStorage") {
     // Read from chrome.storage.local
     chrome.storage.local.get([STORAGE_KEY], (res) => {
@@ -61,6 +63,8 @@ chrome.action.onClicked.addListener(async (tab) => {
 
 // service_worker.js
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  // disabled
+  return
   if (msg?.method !== "RUN_INLINE_SNIPPET" || !sender.tab?.id) return;
 
   const { code = "", preferMainWorld = true } = msg;
@@ -134,3 +138,163 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   return true; // keep sendResponse async
 });
+
+
+// chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+//   if (msg.type === "API_REQUEST_FROM_PAGE") {
+//     console.log(msg)
+//     fetch(msg.url, {
+//       method: msg.method || "GET",
+//       headers: msg.headers || {},
+//       body: msg.body || null,
+//     })
+//       .then(async (res) => {
+//         console.log(res)
+//         const text = await res.text(); // use text() to handle any type
+//         sendResponse({
+//           ok: res.ok,
+//           status: res.status,
+//           headers: Object.fromEntries(res.headers.entries()),
+//           body: text,
+//         });
+//       })
+//       .catch((err) => {
+//         sendResponse({ error: err.message });
+//       });
+//     return true; // Keeps sendResponse async
+//   }
+// });
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  
+  if (msg.type !== "API_REQUEST_FROM_PAGE") return;
+  console.log(msg,'API_REQUEST_FROM_PAGE')
+
+  // 1) Build request init
+  const init = {
+    method: msg.method || "GET",
+    // 2) Default to no credentials unless you absolutely need them
+    credentials: msg.credentials ?? "omit",
+    // 3) DO NOT set mode: "no-cors"
+    mode: msg.mode || 'no-cors',
+    redirect: "follow"
+  };
+
+  // // 4) Sanitize headers: drop restricted & risky ones
+  // const unsafe = new Set([
+  //   "origin", "host", "referer", "cookie", "authorization",
+  //   "user-agent", "accept-encoding", "connection", "content-length"
+  // ]);
+  // if (msg.headers && typeof msg.headers === "object") {
+  //   init.headers = {};
+  //   for (const [k, v] of Object.entries(msg.headers)) {
+  //     if (!unsafe.has(k.toLowerCase())) init.headers[k] = v;
+  //   }
+  // }
+
+  // 5) Attach body only when allowed
+  const m = (init.method || "GET").toUpperCase();
+  if (msg.body && !["GET", "HEAD"].includes(m)) {
+    init.body = msg.body;
+  }
+
+  // 6) Perform the fetch from the background (extension) context
+  fetch(msg.url, init)
+    .then(async (res) => {
+      const text = await res.text();
+      // Convert headers to plain object
+      const headersObj = {};
+      for (const [k, v] of res.headers.entries()) headersObj[k] = v;
+      console.log(res)
+      sendResponse({
+        ok: res.ok,
+        status: res.status,
+        url: res.url,
+        headers: headersObj,
+        body: text
+      });
+    })
+    .catch((err) => {
+      console.error(err)
+      sendResponse({ ok: false, error: err && err.message ? err.message : String(err) });
+    });
+
+  return true; // keep sendResponse async
+});
+
+
+
+
+const apiCallExt__code = `
+// Send request to extension
+function apiCallExt(url, method = "GET", headers = {}, body = null) {
+  return new Promise((resolve) => {
+    window.addEventListener("message", function handler(event) {
+      if (event.source !== window) return;
+      if (event.data.type === "API_RESPONSE_FROM_EXTENSION") {
+        window.removeEventListener("message", handler);
+        resolve(event.data.response);
+      }
+    });
+
+    window.postMessage({
+      type: "API_REQUEST_FROM_PAGE",
+      url,
+      method,
+      headers,
+      body,
+    }, "*");
+  });
+}
+`
+
+
+// service_worker.js
+chrome.runtime.onInstalled.addListener(async () => {
+  await chrome.scripting.registerContentScripts([{
+    id: "frame-fetch-bridge",
+    js: ["js/frame-bridge.js"],   // see section 2 below
+    matches: ["<all_urls>"],
+    allFrames: true,
+    matchOriginAsFallback: true,  // covers about:blank/data: iframes
+    world: "MAIN",                // critical: run in page world
+    runAt: "document_start"
+  }]);
+});
+
+
+
+// // Simple dispatcher: do whatever "extApi" the page needs.
+// chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+//   if (!msg || msg._kind !== "EXTAPI_DISPATCH") return;
+
+//   (async () => {
+//     try {
+//       // Example command: network fetch (customize with your logic)
+//       if (msg.action === "fetch") {
+//         const { url, init } = msg;
+//         const res = await fetch(url, init || {});
+//         const text = await res.text();
+//         const headersObj = {};
+//         for (const [k, v] of res.headers.entries()) headersObj[k] = v;
+//         sendResponse({
+//           ok: res.ok,
+//           status: res.status,
+//           url: res.url,
+//           headers: headersObj,
+//           body: text
+//         });
+//       } else {
+//         // Unknown action -> echo
+//         sendResponse({ ok: true, echo: msg });
+//       }
+//     } catch (err) {
+//       sendResponse({ ok: false, error: err?.message || String(err) });
+//     }
+//   })();
+
+//   return true; // async
+// });
+
+
+// importScripts('background-iframe.js')

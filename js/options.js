@@ -591,6 +591,20 @@ function genericDownload(e, index) {
     downloadScript(index);
   }
 }
+
+function refreshExternal(e, index){
+
+  let d = clone(state.scripts[index])
+
+  removeScript(index,{shiftKey:true})
+  addScript('external')
+  updateField(index,'src','')
+  removeScript(index,{shiftKey:true})
+  // addScript(d.type,index,d)
+  // updateField(index,'src',d.src)
+  
+}
+
 function duplicate(e, index) {
   let d = clone(state.scripts[index])
   // d.name+=' (copy)'
@@ -903,16 +917,18 @@ function maxMinScriptBox(e, index) {
   addExternalBtn.addEventListener('click', () => addScript('external'));
 
   scriptsList.addEventListener('click', (e) => {
+    // alert(e.shiftKey)
     const li = e.target.closest('li.sra-script'); if (!li) return;
     const index = parseInt(li.dataset.index, 10); if (Number.isNaN(index)) return;
 
     if (e.target.closest('.sra-script__plug'))      togglePowerPerScript(index);
-    else if (e.target.closest('.move-up'))          moveUp(index);
-    else if (e.target.closest('.move-down'))        moveDown(index);
+    else if (e.target.closest('.move-up'))          e.shiftKey?moveTo(index,0):moveUp(index);
+    else if (e.target.closest('.move-down'))        e.shiftKey?moveTo(index,state.scripts.length-1):moveDown(index);
     else if (e.target.closest('.remove'))           removeScript(index, e);
     else if (e.target.closest('.download'))         genericDownload(e, index);
     else if (e.target.closest('.duplicate'))         duplicate(e, index);
     else if (e.target.closest('.max-min-btn'))          maxMinScriptBox(e, index);
+    else if (e.target.closest('.refresh-external'))          refreshExternal(e, index);
   });
   
   scriptsList.addEventListener('mousedown', (e) => {

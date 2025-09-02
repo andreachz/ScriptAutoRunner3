@@ -115,9 +115,9 @@ copyBtn.addEventListener('click', async () => {
   }
 });
 
-hue.addEventListener('input', () => {update(); resetBtn.innerText='Defaults'});
-sat.addEventListener('input', () => {update(); resetBtn.innerText='Defaults'});
-light.addEventListener('input', () => {update(); resetBtn.innerText='Defaults'});
+hue.addEventListener('input', () => {update(); resetBtnInner(null)});
+sat.addEventListener('input', () => {update(); resetBtnInner(null)});
+light.addEventListener('input', () => {update(); resetBtnInner(null)});
 
 function hexToHSL(hex) {
   // Remove leading "#"
@@ -193,6 +193,10 @@ const color_defaults = [
   { hex: '#dbadd7', name: 'petal', desc: 'light pink' },
   { hex: '#c478be', name: 'barbie', desc: 'pink' },
 
+  // grey
+  { hex: '#bdbdbd', name: 'cloudy', desc: 'light grey' },
+  { hex: '#949494', name: 'asphalt', desc: 'grey' },
+
 ];
 
 let defaultsIndexColor = 0
@@ -231,5 +235,9 @@ function setDefault(e){
 
 
 function resetBtnInner(c){
-  resetBtn.innerHTML=`Defaults "${c.name}"<br><small>${c.desc}</small>`
+  if(!c){
+  resetBtn.innerHTML='Presets'  
+  return
+  }
+  resetBtn.innerHTML=`Preset "${c.name}"<br><small>${c.desc}</small>`
 }
