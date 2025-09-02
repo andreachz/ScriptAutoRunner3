@@ -1,3 +1,5 @@
+
+
 .sra-wrapper {
   position: relative;
   height: 100%;
@@ -386,6 +388,10 @@
   .sra-script__btns {
     text-align: right;
     width: 146px;
+  }
+  .sra-flex.sra-flex--foot button:focus,
+  .sra-script__btns button:focus {
+    outline: none;
   }
   .sra-script__check {
     display: none;

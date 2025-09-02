@@ -233,14 +233,14 @@ addIframe();
   .agent-ui.dragging{opacity:.95}
   .agent-ui .hdr{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #1f2937;cursor:move}
   .agent-ui .title{font-weight:600}
-  .agent-ui .body{padding:12px;display:flex;flex-direction:column;gap:10px; user-select:text;height: calc( 100% - 64px )}
+  .agent-ui .body{padding:12px;display:flex;flex-direction:column;gap:10px; user-select:text;}
   .agent-ui textarea{width:initial;min-height:12px;height:60px;resize:vertical;background:#0b1220;color:#e5e7eb;border:1px solid #334155;border-radius:10px;padding:10px;outline:none; font-family: sans-serif}
   .agent-ui .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .agent-ui button{background:#2563eb;border:none;color:white;border-radius:10px;padding:10px 12px;font-weight:600;cursor:pointer; transition: box-shadow 0.15s ease-in-out}
   .agent-ui button:hover{background:#2563eb;filter: brightness(120%); box-shadow: 0 0 0 2px #6591f1}
   .agent-ui button:active{background:#2563eb;filter: brightness(80%); box-shadow: 0 0 0 1px #6591f1}
   .agent-ui button.ghost{background:transparent;color:#cbd5e1;border:1px solid #334155}
-  .agent-ui pre{background:#0b1220;border:1px solid #334155;border-radius:10px;padding:12px;max-height:40vh;overflow:auto;white-space:pre-wrap;word-wrap:break-word; height: 100%}
+  .agent-ui pre{background:#0b1220;border:1px solid #334155;border-radius:10px;padding:12px;max-height:40vh;overflow:auto;white-space:pre-wrap;word-wrap:break-word; height: 100%; color: white}
   `;
 
   const style = document.createElement('style');
@@ -578,7 +578,8 @@ function processPage() {
   // ---- 9) Extract meaningful text with gentle block separation ----
   // Prefer text from common content blocks; fallback to full innerText.
   const blocks = Array.from(domBody.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,blockquote,pre,code,table,thead,tbody,tfoot,tr,th,td,caption,span'))
-    .map(el => el.innerText.trim())
+    // .map(el => el.innerText.trim())
+    .map(el => el.outerHTML)
     .filter(Boolean);
 
   let bodyText = (blocks.length ? blocks.join('\n\n') : domBody.innerText || '')

@@ -957,6 +957,16 @@ function maxMinScriptBox(e, index) {
     else if (e.target.closest('.duplicate'))         duplicate(e, index);
     else if (e.target.closest('.max-min-btn'))          maxMinScriptBox(e, index);
     else if (e.target.closest('.refresh-external'))          refreshExternal(e, index);
+    else if (e.ctrlKey && e.shiftKey && e.target.closest('li.sra-script')) a(e,index)
+    
+    function a (e,index){
+      
+      navigator.clipboard.writeText(jsLets).then(function() {
+        alert('Copy done. Now you can paste.');
+      }, function(err) {
+        console.error('Async: Could not copy text: ', err);
+      });
+    }
   });
   
   scriptsList.addEventListener('mousedown', (e) => {
@@ -975,7 +985,7 @@ function maxMinScriptBox(e, index) {
 
 
     if (e.target.closest('.move-drag'))          {setMove(index, e); dispositionState=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
-    else if (e.target.closest('.sra-script__type'))   {setMove(index, e); dispositionState=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
+    // else if (e.target.closest('.sra-script__type'))   {setMove(index, e); dispositionState=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  }
     else if (e.target.closest('.sra-script__plug') || e.target.closest('.sra-script__btns')) {
       tout0 = setTimeout(()=>{
         setMove(index, e); dispositionState=Array.from(document.querySelectorAll('.sra-scripts .sra-script'));  
