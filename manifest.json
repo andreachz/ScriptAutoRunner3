@@ -29,6 +29,7 @@
     "default_title": "ScriptAutoRunner3",
     "default_popup": "popup.html"
   },
+  "optional_permissions": ["debugger"], 
   "permissions": [
     "storage",
     "tabs",

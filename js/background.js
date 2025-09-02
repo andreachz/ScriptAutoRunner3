@@ -224,29 +224,51 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 
 
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg?.method === "RUN_SNIPPET_VIA_SCRIPTING") {
+    const tabId = sender.tab?.id;
+    if (!tabId) return; // can't inject without a tab
 
-const apiCallExt__code = `
-// Send request to extension
-function apiCallExt(url, method = "GET", headers = {}, body = null) {
-  return new Promise((resolve) => {
-    window.addEventListener("message", function handler(event) {
-      if (event.source !== window) return;
-      if (event.data.type === "API_RESPONSE_FROM_EXTENSION") {
-        window.removeEventListener("message", handler);
-        resolve(event.data.response);
-      }
+    chrome.scripting.executeScript({
+      target: { tabId, allFrames: false },
+      world: msg.preferMainWorld ? "MAIN" : "ISOLATED",
+      // Use a function wrapper; pass the code string as an arg
+      func: (source) => {
+        try {
+          // eslint-disable-next-line no-new-func
+          const fn = new Function(source);
+          fn();
+        } catch (e) {
+          console.warn("[Ext] executeScript error:", e);
+        }
+      },
+      args: [msg.code || ""],
+      injectImmediately: true,
     });
+  }
+});
 
-    window.postMessage({
-      type: "API_REQUEST_FROM_PAGE",
-      url,
-      method,
-      headers,
-      body,
-    }, "*");
-  });
-}
-`
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  const tabId = sender.tab?.id;
+  if (!tabId) return;
+
+  if (msg.method === "RUN_STRING_SNIPPET") {
+    chrome.scripting.executeScript({
+      target: { tabId, allFrames: false },
+      world: "ISOLATED",                 // <-- important
+      func: (source) => {
+        try {
+          // Eval inside the ISOLATED world is allowed (TT doesn't apply here)
+          (0, eval)(source);
+        } catch (e) {
+          console.warn("[Ext] isolated eval error:", e);
+        }
+      },
+      args: [msg.code || ""],
+      injectImmediately: true,
+    });
+  }
+});
 
 
 // service_worker.js
@@ -262,39 +284,3 @@ chrome.runtime.onInstalled.addListener(async () => {
   }]);
 });
 
-
-
-// // Simple dispatcher: do whatever "extApi" the page needs.
-// chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-//   if (!msg || msg._kind !== "EXTAPI_DISPATCH") return;
-
-//   (async () => {
-//     try {
-//       // Example command: network fetch (customize with your logic)
-//       if (msg.action === "fetch") {
-//         const { url, init } = msg;
-//         const res = await fetch(url, init || {});
-//         const text = await res.text();
-//         const headersObj = {};
-//         for (const [k, v] of res.headers.entries()) headersObj[k] = v;
-//         sendResponse({
-//           ok: res.ok,
-//           status: res.status,
-//           url: res.url,
-//           headers: headersObj,
-//           body: text
-//         });
-//       } else {
-//         // Unknown action -> echo
-//         sendResponse({ ok: true, echo: msg });
-//       }
-//     } catch (err) {
-//       sendResponse({ ok: false, error: err?.message || String(err) });
-//     }
-//   })();
-
-//   return true; // async
-// });
-
-
-// importScripts('background-iframe.js')

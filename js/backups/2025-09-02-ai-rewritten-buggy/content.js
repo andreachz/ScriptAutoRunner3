@@ -34,6 +34,12 @@ chrome.runtime.sendMessage({ method: "SARgetLocalStorage" }, async (response) =>
 
     if (script.type === "external" && script.src) {
       // Only works if the site's CSP allows that origin.
+      chrome.runtime.sendMessage({ method: "RUN_SMART_SNIPPET", externalUrl: script.src }, console.log);
+
+      continue;
+    }
+    if (script.type === "external" && script.src) {
+      // Only works if the site's CSP allows that origin.
       injectExternal(script.src);
       continue;
     }
@@ -77,6 +83,10 @@ chrome.runtime.sendMessage({ method: "SARgetLocalStorage" }, async (response) =>
 
     
 
+    if (script.type === "snippet") {
+        chrome.runtime.sendMessage({ method: "RUN_SMART_SNIPPET", code: script.code ?? "" }, console.log);
+        continue
+    }
     if (script.type === "snippet") {
       injectBlobSnippet(script.code ?? "")
       // continue

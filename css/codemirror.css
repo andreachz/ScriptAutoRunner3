@@ -10,7 +10,7 @@
   font-size: medium;
   min-width: 730px;
   width: 730px;
-  min-height: 40px;
+  min-height: 20px;
 }
 
 .CodeMirror-empty { color: #888; font-style: initial; }

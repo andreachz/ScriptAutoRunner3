@@ -1,5 +1,8 @@
 
 
+if(window === window.parent){
+
+// alert('apposto')
 async function askTalkai(chatInput){
     
 
@@ -192,7 +195,7 @@ function addIframe(url="https://talkai.info/chat/", width = "600", height = "400
   iframe.width = width;
   iframe.height = height;
   iframe.style.border = "1px solid #ccc";
-//   iframe.style.display='none'
+  iframe.style.display='none'
   document.body.appendChild(iframe);
 
   
@@ -207,7 +210,9 @@ function addIframe(url="https://talkai.info/chat/", width = "600", height = "400
 
 }
 
+
 addIframe();
+
 // write here code that injects interface on html page with field for user prompt and a box for stream response from llm
 (() => {
 
@@ -224,7 +229,7 @@ addIframe();
   .agent-ui{position:fixed;right:16px;bottom:16px;z-index:999999;
     width:min(520px,95vw);background:#111827dd;color:#e5e7eb;border:1px solid #1f2937;backdrop-filter:blur(7px);
     border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);font:14px/1.4 system-ui;
-    user-select:none; resize: both; overflow: hidden}
+    user-select:none; resize: both; overflow: hidden; min-width: 250px; min-height: 180px}
   .agent-ui.dragging{opacity:.95}
   .agent-ui .hdr{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #1f2937;cursor:move}
   .agent-ui .title{font-weight:600}
@@ -242,39 +247,108 @@ addIframe();
   style.textContent = css;
   document.body.appendChild(style);
 
+  // const box = document.createElement('div');
+  // box.className = 'agent-ui';
+  // box.id = 'blower__';
+  // box.style.display='none'
+  // box.innerHTML = `
+  //   <div class="hdr">
+  //     <div class="title">Blower</div>
+  //     <div style="margin-left:auto;display:flex;gap:6px">
+  //       <button class="ghost" data-action="clear">Clear</button>
+  //       <button class="ghost" data-action="close">✕</button>
+  //     </div>
+  //   </div>
+  //   <div class="body">
+  //     <div style="display:flex"></div>
+  //     <textarea id="ask-box" placeholder="Ask me anything..."></textarea>
+  //     <div class="row">
+  //       <button data-action="start" style="width: 100%">Go</button>
+  //     </div>
+  //     <pre id="ai-output">🔎 Ready</pre>
+  //   </div>
+  // `;
+  // document.body.appendChild(box);
+
+  // ==================
+function drawBox(){
   const box = document.createElement('div');
-  box.className = 'agent-ui';
-  box.id = 'blower__';
-  box.style.display='none'
-  box.innerHTML = `
-    <div class="hdr">
-      <div class="title">Blower</div>
-      <div style="margin-left:auto;display:flex;gap:6px">
-        <button class="ghost" data-action="clear">Clear</button>
-        <button class="ghost" data-action="close">✕</button>
-      </div>
-    </div>
-    <div class="body">
-      <div style="display:flex"></div>
-      <textarea id="ask-box" placeholder="Ask me anything..."></textarea>
-      <div class="row">
-        <button data-action="start" style="width: 100%">Go</button>
-      </div>
-      <pre id="ai-output">🔎 Ready</pre>
-    </div>
-  `;
-  document.body.appendChild(box);
+box.className = 'agent-ui';
+box.id = 'blower__';
+box.style.display = 'none';
+
+// Header
+const header = document.createElement('div');
+header.className = 'hdr';
+
+const title = document.createElement('div');
+title.className = 'title';
+title.textContent = 'Blower';
+
+const headerRight = document.createElement('div');
+headerRight.style.marginLeft = 'auto';
+headerRight.style.display = 'flex';
+headerRight.style.gap = '6px';
+
+const clearBtn = document.createElement('button');
+clearBtn.className = 'ghost';
+clearBtn.dataset.action = 'clear';
+clearBtn.textContent = 'Clear';
+
+const closeBtn = document.createElement('button');
+closeBtn.className = 'ghost';
+closeBtn.dataset.action = 'close';
+closeBtn.textContent = '✕';
+
+headerRight.append(clearBtn, closeBtn);
+header.append(title, headerRight);
+
+// Body
+const body = document.createElement('div');
+body.className = 'body';
+
+const flexDiv = document.createElement('div');
+flexDiv.style.display = 'flex';
+
+const textarea = document.createElement('textarea');
+textarea.id = 'ask-box';
+textarea.placeholder = 'Ask me anything...';
+
+const row = document.createElement('div');
+row.className = 'row';
+
+const goBtn = document.createElement('button');
+goBtn.dataset.action = 'start';
+goBtn.style.width = '100%';
+goBtn.textContent = 'Go';
+
+row.appendChild(goBtn);
+
+const output = document.createElement('pre');
+output.id = 'ai-output';
+output.textContent = '🔎 Ready';
+
+// Put it all together
+body.append(flexDiv, textarea, row, output);
+box.append(header, body);
+document.body.appendChild(box);
+return box
+}
+let box=drawBox()
+
 
   // Restore saved position (if any)
   try {
-    const saved = JSON.parse(localStorage.getItem('agent-ui-pos') || '{}');
+    // const saved = JSON.parse(localStorage.getItem('agent-ui-pos') || '{}');
+    const saved = {}
     if (typeof saved.left === 'number' && typeof saved.top === 'number') {
       box.style.left = saved.left + 'px';
       box.style.top  = saved.top  + 'px';
       box.style.right = 'auto';
       box.style.bottom = 'auto';
     }
-    const savedVis = localStorage.getItem('agent-ui-visible');
+    // const savedVis = localStorage.getItem('agent-ui-visible');
+    const savedVis = 'hidden'
     if (savedVis === 'hidden') box.style.display = 'none';
   } catch {}
 
@@ -342,7 +416,7 @@ addIframe();
     // persist position
     try {
       const r = box.getBoundingClientRect();
-      localStorage.setItem('agent-ui-pos', JSON.stringify({ left: Math.round(r.left), top: Math.round(r.top) }));
+      // localStorage.setItem('agent-ui-pos', JSON.stringify({ left: Math.round(r.left), top: Math.round(r.top) }));
     } catch {}
   }
 
@@ -381,7 +455,7 @@ addIframe();
     box.style.bottom = 'auto';
     usingLeftTop = true;
     try {
-      localStorage.setItem('agent-ui-pos', JSON.stringify({ left: Math.round(left), top: Math.round(top) }));
+      // localStorage.setItem('agent-ui-pos', JSON.stringify({ left: Math.round(left), top: Math.round(top) }));
     } catch {}
   });
 
@@ -390,7 +464,7 @@ addIframe();
     const hidden = box.style.display === 'none';
     box.style.display = hidden ? '' : 'none';
     try {
-      localStorage.setItem('agent-ui-visible', hidden ? 'shown' : 'hidden');
+      // localStorage.setItem('agent-ui-visible', hidden ? 'shown' : 'hidden');
     } catch {}
     document.querySelector('#ask-box').focus()
   }
@@ -621,3 +695,4 @@ function parseSSE(raw) {
   return output.join("").replaceAll('\\n','\n'); // merge into plain string
 }
 
+}

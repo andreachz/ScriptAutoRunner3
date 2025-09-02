@@ -596,14 +596,41 @@ function refreshExternal(e, index){
 
   let d = clone(state.scripts[index])
 
+  
   removeScript(index,{shiftKey:true})
-  addScript('external')
-  updateField(index,'src','')
-  removeScript(index,{shiftKey:true})
+  addScript(d.type, index, d)
+  // updateField(index,'src','')
+  // removeScript(index,{shiftKey:true})
   // addScript(d.type,index,d)
   // updateField(index,'src',d.src)
   
 }
+let haveBeenCollapsed=false
+function collapse(e, index) {
+  if (e.shiftKey) {
+    haveBeenCollapsed = !haveBeenCollapsed;
+    Array.from(document.querySelectorAll('.sra-scripts .sra-script')).forEach((el) => {
+      const targets = el.querySelectorAll(
+        '.monaco-container, .CodeMirror, textarea, .padding-external'
+      );
+      targets.forEach((a) => {
+        a.style.height = haveBeenCollapsed ? '0px' : '';
+      });
+    });
+  } else {
+    Array.from(document.querySelectorAll('.sra-scripts .sra-script')).forEach((el, i) => {
+      if (index === i) {
+        const targets = el.querySelectorAll(
+          '.monaco-container, .CodeMirror, textarea, .padding-external'
+        );
+        targets.forEach((a) => {
+          a.style.height = a.style.height === '0px' ? '' : '0px';
+        });
+      }
+    });
+  }
+}
+
 
 function duplicate(e, index) {
   let d = clone(state.scripts[index])
@@ -922,6 +949,7 @@ function maxMinScriptBox(e, index) {
     const index = parseInt(li.dataset.index, 10); if (Number.isNaN(index)) return;
 
     if (e.target.closest('.sra-script__plug'))      togglePowerPerScript(index);
+    else if (e.target.closest('.collapse'))         collapse(e, index);
     else if (e.target.closest('.move-up'))          e.shiftKey?moveTo(index,0):moveUp(index);
     else if (e.target.closest('.move-down'))        e.shiftKey?moveTo(index,state.scripts.length-1):moveDown(index);
     else if (e.target.closest('.remove'))           removeScript(index, e);

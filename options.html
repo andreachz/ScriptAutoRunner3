@@ -109,7 +109,8 @@
               <input class="sra-script__name" type="text" name="script__name">
               <div class="sra-script__btns">
                 <button class="sra-script__btn move-drag" style="transform: scaleX(180%); margin-right: 3px; cursor: grab;" title="Drag to move up or down">=</button>
-                <button class="sra-script__btn max-min-btn" style="margin-right: 3px; cursor: pointer;" title="Maximize/Minimize"><div class="max-min-icon"></div></button>
+                <button class="sra-script__btn collapse" style="transform: scaleX(240%) translate(1px, -2px); margin-right: 3px;" title="Collapse/Expand. [Shift+Click]: collapse/expand all">-</button>
+                <button class="sra-script__btn max-min-btn" style="margin-right: 3px; cursor: pointer;" title="Maximize/Restore"><div class="max-min-icon"></div></button>
                 <button class="sra-script__btn move-up" title="Move up. [Shift+Click]: move to top"><i class="icon-up-circled"></i></button>
                 <button class="sra-script__btn move-down" title="Move down. [Shift+Click]: move to bottom"><i class="icon-down-circled"></i></button>
               </div>
@@ -124,8 +125,11 @@
               </div>
               <div class="sra-script__external">
                 <input class="src" type="text" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)" name="script__external">
-                <button class="sra-script__btn refresh-external" style="margin: 6px 0 0 0;" title="refresh"><i style="margin: 0;" class="icon2-arrows-cw"></i></button>
-                <div class="padding-external" style="height: 150px; opacity: 1;overflow: hidden; resize: both; min-width: 732px;"></div>
+                
+                <div class="padding-external" style="min-height: 16px; height: 150px; opacity: 1;overflow: hidden; resize: both; min-width: 732px;">
+                    <button hidden class="sra-script__btn refresh-external" style="margin: 6px 0 0 0;" title="refresh"><i style="margin: 0;" class="icon2-arrows-cw"></i></button>
+                    <small>Press Ctrl+Shift+R on target page to force script refresh</small>
+                </div>
               </div>
             </div>
             <div class="sra-flex sra-flex--foot">

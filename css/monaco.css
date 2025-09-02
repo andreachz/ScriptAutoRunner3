@@ -31,7 +31,7 @@ textarea.monaco {
   overflow: auto;      /* required for resize handle to show */
   min-width: 730px;
   width: 700px;
-  min-height: 40px;
+  min-height: 20px;
   /* transition: width 0.15s ease-in-out,
               height 0.15s ease-in-out */
   /* background: transparent; */

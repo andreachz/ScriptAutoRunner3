@@ -385,7 +385,7 @@
   }
   .sra-script__btns {
     text-align: right;
-    width: 116px;
+    width: 146px;
   }
   .sra-script__check {
     display: none;
@@ -451,7 +451,7 @@
     padding: 5px;
     width: 100%;
     box-sizing: border-box;
-    min-height: 100px;
+    min-height: 20px;
     height: 180px;
     border-radius: 1px;
     background-color: transparent;
