@@ -577,6 +577,24 @@ function processPage() {
 
   // ---- 9) Extract meaningful text with gentle block separation ----
   // Prefer text from common content blocks; fallback to full innerText.
+  // const blocks = Array.from(domBody.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,blockquote,pre,code,table,thead,tbody,tfoot,tr,th,td,caption,span'))
+  //   // .map(el => el.innerText.trim())
+  //   .map(el => el.outerHTML)
+  //   .filter(Boolean);
+      function removeAllAttributesFromChildren(element) {
+      if (!element || !element.children) return;
+
+      for (let child of element.children) {
+        // remove all attributes from this child
+        while (child.attributes.length > 0) {
+          child.removeAttribute(child.attributes[0].name);
+        }
+        // recurse into child’s children
+        removeAllAttributesFromChildren(child);
+      }
+    }
+  removeAllAttributesFromChildren(domBody);
+
   const blocks = Array.from(domBody.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,blockquote,pre,code,table,thead,tbody,tfoot,tr,th,td,caption,span'))
     // .map(el => el.innerText.trim())
     .map(el => el.outerHTML)
@@ -587,6 +605,21 @@ function processPage() {
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
+
+    function minifyHTML(elementOrString) {
+  // If a DOM element was passed, serialize it to string
+  let html = typeof elementOrString === "string" 
+    ? elementOrString 
+    : elementOrString.outerHTML;
+
+  return html
+    .replaceAll('&nbsp;',' ')
+    .replace(/\s+/g, " ")       // collapse multiple spaces/newlines into one space
+    .replace(/>\s+</g, ">\n<")    // remove whitespace between tags
+    .trim();                    // trim leading/trailing space
+}
+
+bodyText=minifyHTML(bodyText)
 
     
 

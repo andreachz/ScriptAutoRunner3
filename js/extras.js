@@ -3,6 +3,7 @@ async function loadAppletScripts() {
   const files = [
     "js/applets/hello-script.js",
     "js/applets/blower.js",
+    "js/applets/apiExt.js",
   ];
 
   // fetch them all
