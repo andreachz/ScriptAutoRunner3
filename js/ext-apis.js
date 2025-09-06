@@ -1,7 +1,7 @@
 // ext-apis.js
 (function(){
 // Send request to extension
-function apiExt(url, method = "GET", headers = {}, body = null) {
+function apiExt(url, method = "GET", headers = {}, body = null, mode='no-cors') {
   return new Promise((resolve) => {
     window.addEventListener("message", function handler(event) {
       if (event.source !== window) return;
@@ -17,6 +17,7 @@ function apiExt(url, method = "GET", headers = {}, body = null) {
       method,
       headers,
       body,
+      mode
     }, "*");
   });
 }

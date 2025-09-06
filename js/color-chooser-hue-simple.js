@@ -204,12 +204,12 @@ let defaultsIndexColor = 0
 function setDefault(e){
   
   let back = 0
-  if (e.button === 2 || e.ctrlKey) { // right click
+  if (e &&( e.button === 2 || e.ctrlKey)) { // right click
     e.preventDefault()
     back = -2
   }
 
-  let current = JSON.parse(localStorage.getItem(SAR_COLOR_HSL))
+  let current = JSON.parse(localStorage.getItem(SAR_COLOR_HSL) || JSON.stringify(color_defaults[12]))
 
   let idx = color_defaults.findIndex(x => x.hex === current.hex)
   let nextIndex = (idx + 1 + back) % color_defaults.length

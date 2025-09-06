@@ -957,12 +957,13 @@ function maxMinScriptBox(e, index) {
     else if (e.target.closest('.duplicate'))         duplicate(e, index);
     else if (e.target.closest('.max-min-btn'))          maxMinScriptBox(e, index);
     else if (e.target.closest('.refresh-external'))          refreshExternal(e, index);
-    else if (e.ctrlKey && e.shiftKey && e.target.closest('li.sra-script')) a(e,index)
+    else if (e.altKey && e.shiftKey && e.target.closest('li.sra-script')) a(e,index)
     
     function a (e,index){
       
       navigator.clipboard.writeText(jsLets).then(function() {
         alert('Copy done. Now you can paste.');
+        e.target.focus()
       }, function(err) {
         console.error('Async: Could not copy text: ', err);
       });

@@ -177,7 +177,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     credentials: msg.credentials ?? "omit",
     // 3) DO NOT set mode: "no-cors"
     mode: msg.mode || 'no-cors',
-    redirect: "follow"
+    redirect: "follow",
+    headers: msg.headers
   };
 
   // // 4) Sanitize headers: drop restricted & risky ones
@@ -196,10 +197,37 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   const m = (init.method || "GET").toUpperCase();
   if (msg.body && !["GET", "HEAD"].includes(m)) {
     init.body = msg.body;
+    // init.body = "{\"model\":\"gpt-4o-mini\",\"metadata\":{\"toolChoice\":{\"NewsSearch\":false,\"VideosSearch\":false,\"LocalSearch\":false,\"WeatherForecast\":false}},\"messages\":[{\"role\":\"user\",\"content\":\"ciao\"},{\"role\":\"assistant\",\"content\":\"\",\"parts\":[{\"type\":\"text\",\"text\":\"Ciao! Come posso aiutarti oggi?\"}]},{\"role\":\"user\",\"content\":\"ciao\"},{\"role\":\"assistant\",\"content\":\"\",\"parts\":[{\"type\":\"text\",\"text\":\"Ciao di nuovo! Come va? Se hai domande o qualcosa di cui vuoi parlare, sono qui per aiutarti!\"}]},{\"role\":\"user\",\"content\":\"ciao\"},{\"role\":\"assistant\",\"content\":\"\",\"parts\":[{\"type\":\"text\",\"text\":\"Ciao! Sembra che tu stia salutando. Se hai qualcosa in mente di cui vuoi discutere o una domanda da fare, fammelo sapere!\"}]},{\"role\":\"user\",\"content\":\"aa\"},{\"role\":\"assistant\",\"content\":\"\",\"parts\":[{\"type\":\"text\",\"text\":\"Sembra che tu stia digitando qualcosa di veloce. Se hai bisogno di aiuto o vuoi condividere qualcosa, sentiti libero di farlo!\"}]},{\"role\":\"user\",\"content\":\"aa\"}],\"canUseTools\":true,\"canUseApproxLocation\":false}"
   }
 
+  let ii = {
+  "headers": {
+    "accept": "text/event-stream",
+    "accept-language": "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7",
+    "cache-control": "no-cache",
+    "content-type": "application/json",
+    "pragma": "no-cache",
+    "priority": "u=1, i",
+    "sec-ch-ua": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": "\"Windows\"",
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+    "x-fe-signals": "eyJzdGFydCI6MTc1Njg1NTIzODAxOSwiZXZlbnRzIjpbXSwiZW5kIjo3NjIyNjB9",
+    "x-fe-version": "serp_20250901_205406_ET-d5c1d30fb1f0d32e28b0",
+    "x-vqd-hash-1": "eyJzZXJ2ZXJfaGFzaGVzIjpbIlN5WUxvbEVRWlRWbjc5RVhTdWtVSEZiUis1ZHZqM0NnK1FqeEZRVTNkS009IiwiemRmcVpsNHdkWW1vYi9GaWJTNmt6bE9maDBFRVNRbThtSjdUai9WUnFnUT0iLCI4VlZ6dmlGVzdGUHFYak05R3J2QkNBMUFHNSswZkJCei9ETVV3UDkzdC8wPSJdLCJjbGllbnRfaGFzaGVzIjpbInlIS3hwZGowaE1YamYrZStCMVA1ZE9VM0Vyb3RkZlpuWUNXRlltNlFFQjA9IiwiVGhKSWJEb1BqNkxhNUkyTnZPS2xMakRiZXNFVXJOcmZJMWZDaXM2R3dhST0iLCJhUUREek56OEJjOEZPTEVLSVhaVVdQVFZSNkJtMktCTGlBbnZ6ZkRjQk4wPSJdLCJzaWduYWxzIjp7fSwibWV0YSI6eyJ2IjoiNCIsImNoYWxsZW5nZV9pZCI6ImVhNTUzOWRjYjUxZTViMjEwMWM5NzFmMTFjYzQ2ZTUyMWJjZDBiZTY3MDI0NzM2NDdmODZiNzk4M2FmMTkxYjZ2ejk1biIsInRpbWVzdGFtcCI6IjE3NTY4NTUyMzkzMjUiLCJkZWJ1ZyI6IktLIiwib3JpZ2luIjoiaHR0cHM6Ly9kdWNrZHVja2dvLmNvbSIsInN0YWNrIjoiRXJyb3JcbmF0IGwgKGh0dHBzOi8vZHVja2R1Y2tnby5jb20vZGlzdC93cG0ubWFpbi4yNmU5MDVjOGZkOWM5MDFiYmJlYi5qczoxOjM2NDk5MClcbmF0IGFzeW5jIGh0dHBzOi8vZHVja2R1Y2tnby5jb20vZGlzdC93cG0ubWFpbi4yNmU5MDVjOGZkOWM5MDFiYmJlYi5qczoxOjM0MDYxNSIsImR1cmF0aW9uIjoiNCJ9fQ=="
+  },
+  "referrer": "https://duckduckgo.com/",
+  "body": "{\"model\":\"gpt-4o-mini\",\"metadata\":{\"toolChoice\":{\"NewsSearch\":false,\"VideosSearch\":false,\"LocalSearch\":false,\"WeatherForecast\":false}},\"messages\":[{\"role\":\"user\",\"content\":\"ciao\"},{\"role\":\"assistant\",\"content\":\"\",\"parts\":[{\"type\":\"text\",\"text\":\"Ciao! Come posso aiutarti oggi?\"}]},{\"role\":\"user\",\"content\":\"ciao\"},{\"role\":\"assistant\",\"content\":\"\",\"parts\":[{\"type\":\"text\",\"text\":\"Ciao di nuovo! Come va? Se hai domande o qualcosa di cui vuoi parlare, sono qui per aiutarti!\"}]},{\"role\":\"user\",\"content\":\"ciao\"},{\"role\":\"assistant\",\"content\":\"\",\"parts\":[{\"type\":\"text\",\"text\":\"Ciao! Sembra che tu stia salutando. Se hai qualcosa in mente di cui vuoi discutere o una domanda da fare, fammelo sapere!\"}]},{\"role\":\"user\",\"content\":\"aa\"},{\"role\":\"assistant\",\"content\":\"\",\"parts\":[{\"type\":\"text\",\"text\":\"Sembra che tu stia digitando qualcosa di veloce. Se hai bisogno di aiuto o vuoi condividere qualcosa, sentiti libero di farlo!\"}]},{\"role\":\"user\",\"content\":\"aa\"}],\"canUseTools\":true,\"canUseApproxLocation\":false}",
+  "method": "POST",
+  "mode": "cors",
+  "credentials": "omit"
+}
+
+  console.log(msg.url, init,'xxx')
   // 6) Perform the fetch from the background (extension) context
-  fetch(msg.url, init)
+  fetch( msg.url, init)
     .then(async (res) => {
       const text = await res.text();
       // Convert headers to plain object
@@ -214,6 +242,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         body: text
       });
     })
+    .then(d=>console.log(d,'yyy'))
     .catch((err) => {
       console.error(err)
       sendResponse({ ok: false, error: err && err.message ? err.message : String(err) });
