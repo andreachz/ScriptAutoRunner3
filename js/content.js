@@ -8,6 +8,15 @@ window.addEventListener('error', e => {
   console.warn('[Ext] window error during blob load:', e.message, e.filename, e.lineno, e.colno);
 });
 
+function isInIframe() {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    // If cross-origin policy blocks access, assume it's in an iframe
+    return true;
+  }
+}
+
 chrome.runtime.sendMessage({ method: "SARgetLocalStorage" }, async (response) => {
   const data = response?.data;
   if (!data || !Array.isArray(data.scripts)) return;
@@ -29,6 +38,10 @@ chrome.runtime.sendMessage({ method: "SARgetLocalStorage" }, async (response) =>
   if (data.options?.exclude && isExcluded(data.options.exclude)) return;
 
   for (const script of data.scripts) {
+
+    if(script.context=='page' && isInIframe()) continue
+    if(script.context=='iframe' && !isInIframe()) continue
+
     if (!script?.enable) continue;
     if (!matchList(script.host)) continue;
 

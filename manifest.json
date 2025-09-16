@@ -29,13 +29,13 @@
     "default_title": "ScriptAutoRunner3",
     "default_popup": "popup.html"
   },
-  "optional_permissions": ["debugger"], 
+  
   "permissions": [
     "storage",
     "tabs",
-    "scripting",
+    "scripting"
 
-    "webNavigation"
+    
   ],
   "host_permissions": [
     "<all_urls>"

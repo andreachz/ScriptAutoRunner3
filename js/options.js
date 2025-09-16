@@ -23,6 +23,9 @@ document.getElementById("info-btn").addEventListener("click", function () {
 
 (function () {
   // Defaults & keys
+
+  const CONTEXTS = ['page', 'iframe', 'all']
+
   const DEFAULT_SCRIPT = {
     id: null,
     enable: false,
@@ -30,8 +33,12 @@ document.getElementById("info-btn").addEventListener("click", function () {
     type: 'snippet', // 'snippet' | 'external'
     src: '',
     code: '',
-    host: ''
+    host: '',
+    context: CONTEXTS[0] // 'page' | 'frame' | 'all'
   };
+  
+  
+
   const DEFAULT_OPTIONS = { exclude: '' };
   const STORAGE_KEY = 'SAR';
   const OLD_STORAGE_KEY = 'SRA';
@@ -298,6 +305,8 @@ function createScriptListItem(script, index) {
   const dnBtn = li.querySelector('.move-down');
   if (upBtn) upBtn.classList.toggle('disabled-item', index === 0);
   if (dnBtn) dnBtn.classList.toggle('disabled-item', index === state.scripts.length - 1);
+
+  li.querySelector('.context-box').innerText = (state.scripts[index].context || CONTEXTS[2]).toString().substring(0,1)
 
   return li;
 }
@@ -605,6 +614,16 @@ function refreshExternal(e, index){
   // updateField(index,'src',d.src)
   
 }
+
+
+
+function selectContext(e, index){
+  state.scripts[index].context = CONTEXTS[(CONTEXTS.findIndex(x=>x==state.scripts[index].context)+1)%CONTEXTS.length]
+  let newcontext = state.scripts[index].context
+  document.querySelectorAll('.sra-scripts .sra-script')[index].querySelector('.context-box').innerText = newcontext.substring(0,1)
+  save()
+}
+
 let haveBeenCollapsed=false
 function collapse(e, index) {
   if (e.shiftKey) {
@@ -957,6 +976,7 @@ function maxMinScriptBox(e, index) {
     else if (e.target.closest('.duplicate'))         duplicate(e, index);
     else if (e.target.closest('.max-min-btn'))          maxMinScriptBox(e, index);
     else if (e.target.closest('.refresh-external'))          refreshExternal(e, index);
+    else if (e.target.closest('.context'))          selectContext(e, index);
     else if (e.altKey && e.shiftKey && e.target.closest('li.sra-script')) a(e,index)
     
     function a (e,index){
