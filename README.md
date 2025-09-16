@@ -33,6 +33,7 @@ The original extension relied on features no longer supported in MV3 and could n
   - Added drag-and-drop support for moving and rearranging scripts.
   - Added deletion options with key combinations on delete button.  
   - Added script duplicate button.
+  - Added script context execution selection with button.
   - Added theme color chooser in options menu.
   - UI/UX visual improvements and bugfixes.
 
