@@ -182,7 +182,7 @@ const color_defaults = [
   { hex: '#88bf7d', name: 'grass', desc: 'green' },
 
   // blue
-  { hex: '#a7d8e2', name: 'sky', desc: 'light blue' },
+  { hex: '#a7d8e2', name: 'cerenkov', desc: 'light blue' },
   { hex: '#7daabf', name: 'night', desc: 'blue' },
 
   // red
