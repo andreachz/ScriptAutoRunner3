@@ -89,9 +89,47 @@
             <i style="position: relative; top: 1px;" class="icon-link"></i>
           </button>
         </div>
+
+        <div class="sra-btns-menu" style="transform: translateY(-18px)">
+          <div style="display: flex;">
+            <input id="searchbar" style="padding: 10px; padding-bottom: 11px; font-size: 15px; width: 106px; background: #454851; color: white" placeholder="Search">
+            <div style="display: flex; flex-direction: column; gap: 2px; margin-left: 2px;">
+              <div title="Search in scripts' title" id="search_in_title" class="toggle-box"><span>T</span></div>
+              <div title="Search in scripts' content" id="search_in_content" class="toggle-box"><span>C</span></div>
+            </div>
+          <!-- <div style="position: absolute; font-size: 14px; display: flex; margin-top: 2px; user-select: none;">
+            <label style="display: flex; align-items: center; gap: 0px; cursor: pointer;">
+              <input type="checkbox" style="margin-left: 0;">
+              <span>name</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0px; cursor: pointer;">
+              <input type="checkbox" style="margin-left: 10px;">
+              <span>content</span>
+            </label>
+          </div> -->
+          <!-- <div style="position: absolute; font-size: 14px; display: flex; margin-top: 2px; user-select: none;">
+            <div style="height: 20px; width: 20px; background-color: red;">
+              <div>
+
+              </div>
+            </div>
+          </div> -->
+
+          </div>
+          
+          <!-- <button class="sra-btn" id="addSnippetBtn" title="Add JS snippet">
+            <i class="icon-code"></i>
+          </button>
+          <button class="sra-btn" id="addExternalBtn" title="Add external JS file from URL">
+            <i style="position: relative; top: 1px;" class="icon-link"></i>
+          </button> -->
+        </div>
         
         <div class="sra-noscripts">
           <span>...</span>
+        </div>
+        <div id="not-found" style="margin-top: 10px; font-style: italic; filter: saturate(0);">
+
         </div>
         
         <ul class="sra-scripts" id="scriptsList"></ul>
@@ -147,6 +185,69 @@
         </div>
       </li>
     </template>
+
+
+<template id="scriptItemTemplate2">
+  <li class="sra-script">
+    <!-- Drag handle -->
+    <td class="sra-cell drag-cell">
+      <button class="sra-script__btn move-drag" title="Drag to move up or down" draggable="true" style="cursor: grab;">=</button>
+    </td>
+
+    <!-- Script index / label -->
+    <td class="sra-cell index-cell">
+      <input class="sra-script__name" type="text" name="script__name" placeholder="Script name">
+    </td>
+
+    <!-- Script type -->
+    <td class="sra-cell type-cell">
+      <i class="type-icon"></i>
+    </td>
+
+    <!-- Code snippet -->
+    <td class="sra-cell snippet-cell">
+      <textarea class="code monaco no-page-scroll" placeholder="Write your own code here." name="script__snippet"></textarea>
+    </td>
+
+    <!-- External JS URL -->
+    <td class="sra-cell external-cell">
+      <input class="src" type="text" placeholder="Set JS file's URL. (e.g. //code.jquery.com/jquery-2.1.4.min.js)" name="script__external">
+      <div class="padding-external" style="min-height:16px; height:150px; opacity:1; overflow:hidden; resize:both; min-width:300px;">
+        <button hidden class="sra-script__btn refresh-external" title="refresh"><i class="icon2-arrows-cw"></i></button>
+        <small>Press Ctrl+Shift+R on target page to force script refresh</small>
+      </div>
+    </td>
+
+    <!-- Hostnames -->
+    <td class="sra-cell host-cell">
+      <input class="sra-script__host host" placeholder="Target hostnames, split by comma. Default: all hosts" name="script__host">
+    </td>
+
+    <!-- Context -->
+    <td class="sra-cell context-cell" style="text-align:center;">
+      <button class="sra-script__btn context" title="Select script execution context: page (P), iframe (I), all (A)">
+        <div class="context-box" style="border:1px solid; border-radius:2px; width:16px; height:16px; font-size:12px; font-weight:bold; text-transform:capitalize; user-select:none;"></div>
+      </button>
+    </td>
+
+    <!-- Controls: collapse/max/min/up/down -->
+    <td class="sra-cell controls-cell">
+      <button class="sra-script__btn collapse" title="Collapse/Expand. [Shift+Click]: collapse/expand all">-</button>
+      <button class="sra-script__btn max-min-btn" title="Maximize/Restore"><div class="max-min-icon"></div></button>
+      <button class="sra-script__btn move-up" title="Move up. [Shift+Click]: move to top"><i class="icon-up-circled"></i></button>
+      <button class="sra-script__btn move-down" title="Move down. [Shift+Click]: move to bottom"><i class="icon-down-circled"></i></button>
+    </td>
+
+    <!-- Duplicate / Download / Remove -->
+    <td class="sra-cell actions-cell">
+      <button class="sra-script__btn duplicate" title="Duplicate this script"><i class="icon2-docs"></i></button>
+      <button class="sra-script__btn download" title="Download script. Shift+Click: export all data"><i class="icon2-download"></i></button>
+      <button class="sra-script__btn remove" title="Shift+Click: delete without confirm. Ctrl+Shift+Click: delete all"><i class="icon-trash"></i></button>
+    </td>
+  </li>
+</template>
+
+
     
     <div id="backdrop-panel" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: transparent; z-index: 1000;" hidden></div>
     <script src="js/monaco-editor/min/vs/loader.js"></script>
