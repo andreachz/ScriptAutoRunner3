@@ -35,6 +35,7 @@ The original extension relied on features no longer supported in MV3 and could n
   - Added script duplicate button.
   - Added script context execution selection with button.
   - Added theme color chooser in options menu.
+  - Added search bar feature. Search by scripts' title and content.
   - UI/UX visual improvements and bugfixes.
 
 ### UI overview
