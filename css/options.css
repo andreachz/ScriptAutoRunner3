@@ -629,7 +629,8 @@
 
 .toggle-box{
   border: 1px solid #454851;
-  background-color: var(--main-color);
+  border-left: 2px solid;
+  /* background-color: var(--main-color); */
   color: #454851;
   width: 18px;
   height: 18px;
@@ -639,6 +640,8 @@
   cursor: pointer;
   font-weight: bold;
   border-radius: 2px;
+  box-shadow: 0px 0px 0px 1px black inset;
+  backdrop-filter: saturate(150%) brightness(90%);
 }
 
 .toggle-box:hover{
@@ -650,5 +653,6 @@
   background-color: #454851; */
   border: 1px solid transparent;
   font-weight: normal;
-  opacity: 0.7;
+  opacity: 0.6;
+  backdrop-filter: saturate(50%) brightness(80%);
 }
