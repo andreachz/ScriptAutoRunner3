@@ -819,8 +819,8 @@ function maxMinScriptBox(e, index) {
     el.dataset.width = textbox.style.width;
     el.dataset.height = textbox.style.height;
 
-    textbox.style.width = 'calc( 100vw - 220px )';
-    textbox.style.height = 'calc( 100vh - 90px )';
+    textbox.style.width = 'calc( 100vw - 190px )';
+    textbox.style.height = 'calc( 100vh - 102px )';
     
     // el.style.zIndex = "9999";
     setTimeout(()=>{
