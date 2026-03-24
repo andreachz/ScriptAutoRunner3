@@ -3,6 +3,8 @@
 }
 :root {
   --main-color: #F3D32F;
+  /* --script-box-width: 730px */
+  --script-box-width: 760px
   /* --main-color: hsl(183, 89%, 57%); */
   /* --main-color-transparent: #f3d32fe6; */
   /* --main-color-transparent: #0091ff; */

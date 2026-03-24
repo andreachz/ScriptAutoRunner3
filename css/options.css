@@ -396,10 +396,13 @@
     width: 100%;
     box-sizing: border-box;
     margin-left: 30px;
+    margin-left: 0px;
     /* border-bottom: 1px solid gray; */
     background-color: rgba(255, 255, 255, 0.15);
-    padding: 3px;
+    padding: 6px 5px;
     font-weight: bold;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+
   }
   .sra-script__btns {
     text-align: right;
@@ -435,6 +438,12 @@
     width: 20px;
     text-align: center;
     cursor: grab;
+    /* show hide script type icon */
+    display: none; 
+  }
+
+  .sra-script__type-title{
+    display: initial; font-size: 18px; margin-right: 8px; cursor: default; margin-top: -2px; margin-left: 5px;
   }
   
   .sra-script__radio:checked + .sra-script__type {
@@ -483,7 +492,7 @@
     font-size: 14px;
     line-height: 1.2;
     font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
-    min-width: 730px;
+    min-width: var(--script-box-width);
   }
   
   .sra-script__btn {
@@ -549,6 +558,7 @@
   border: 1px solid rgba(0, 0, 0, 0.3); 
   width: 100%;
   padding-left: 6px;
+  border-radius: 2px;
 }
 
 .sra-script__external .src::placeholder{
@@ -578,7 +588,9 @@
   }
   .sra-flex--foot {
     padding-left: 30px;
-    margin-top: 5px;
+    padding-left: 0px;
+    margin-top: 7px;
+    margin-bottom: 4px;
   }
   .sra-flex--foot .icon-cloud-flash {
     font-size: 18px;

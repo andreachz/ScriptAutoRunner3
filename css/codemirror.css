@@ -8,8 +8,8 @@
   direction: ltr;
   resize: both;
   font-size: medium;
-  min-width: 730px;
-  width: 730px;
+  min-width: var(--script-box-width);
+  width: var(--script-box-width);
   min-height: 20px;
 }
 
