@@ -230,6 +230,7 @@ search_in_content.onclick = () => {
   const excludeText = document.getElementById('excludeText');
 
   const addSnippetBtn = document.getElementById('addSnippetBtn');
+  const addSnippetBtnPlusBtn = document.getElementById('addSnippetBtnPlusBtn');
   const addExternalBtn = document.getElementById('addExternalBtn');
 
   // Renderers
@@ -1060,6 +1061,7 @@ function maxMinScriptBox(e, index) {
   excludeText.addEventListener('keyup', () => { state.options.exclude = excludeText.value; save(); });
 
   addSnippetBtn.addEventListener('click', () => addScript('snippet'));
+  addSnippetBtnPlusBtn.addEventListener('click', () => addScript('snippet'));
   addExternalBtn.addEventListener('click', () => addScript('external'));
 
   scriptsList.addEventListener('click', (e) => {
