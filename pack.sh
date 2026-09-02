@@ -28,5 +28,9 @@ done
 # Build the zip
 zip -r "$OUTPUT" . "${EXCLUDES[@]}"
 
-# ./pack.sh ../ScriptAutoRunner3 ./a.zip ".git/*" "history/*" "docs/*" $0
+
 # ./pack.sh . ./a.zip ".git/*" "history/*" "docs/*" $0
+
+
+# run this to pack
+# ./pack.sh ../ScriptAutoRunner3 ./a.zip ".git/*" "history/*" "docs/*" $0
